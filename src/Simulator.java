@@ -6,7 +6,7 @@ import javax.swing.*;
 
 public class Simulator extends JFrame {
 
-    public Simulator() {
+    private Simulator() {
         initializeUI();
     }
 
@@ -14,7 +14,7 @@ public class Simulator extends JFrame {
         setTitle("MDP Group 16 Simulator");
         setSize(800, 600);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
     public static void main(String[] args) {
