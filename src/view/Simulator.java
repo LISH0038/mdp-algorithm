@@ -3,7 +3,6 @@ package view;
 import model.entity.Grid;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 
 /**
@@ -13,17 +12,18 @@ import java.awt.*;
 public class Simulator extends JFrame {
 
     private JPanel mMapPanel;
-    private JPanel mButtonPanel;
+    private JPanel mBottomPanel;
     private Grid mSimulationGrid;
 
     private Simulator() {
         mSimulationGrid = new Grid();
-        initializeFrame();
         initializeMap();
         initializeButtons();
+        initializeFrame();
     }
 
     private void initializeFrame() {
+        pack();
         setTitle("MDP Group 16 Simulator");
         setResizable(false);
         setLocationRelativeTo(null);
@@ -38,14 +38,13 @@ public class Simulator extends JFrame {
     }
 
     private void initializeButtons() {
-        mButtonPanel = new ButtonPanel();
-        this.add(mButtonPanel, BorderLayout.PAGE_END);
+        mBottomPanel = new BottomPanel();
+        this.add(mBottomPanel, BorderLayout.PAGE_END);
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             Simulator simulator = new Simulator();
-            simulator.pack();
             simulator.setVisible(true);
         });
         System.out.println("MDP simulator started.");
