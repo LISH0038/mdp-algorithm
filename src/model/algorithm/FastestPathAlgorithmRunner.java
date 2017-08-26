@@ -1,4 +1,4 @@
-package algorithm;
+package model.algorithm;
 
 /**
  * Created by koallen on 25/8/17.
