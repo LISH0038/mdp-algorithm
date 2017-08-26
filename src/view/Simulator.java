@@ -1,9 +1,11 @@
 package view;
 
 import model.entity.Grid;
+import model.entity.Robot;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Observer;
 
 /**
  * Simulator
@@ -14,9 +16,11 @@ public class Simulator extends JFrame {
     private JPanel mMapPanel;
     private JPanel mBottomPanel;
     private Grid mSimulationGrid;
+    private Robot mSimulationRobot;
 
     private Simulator() {
         mSimulationGrid = new Grid();
+        mSimulationRobot = new Robot();
         initializeMap();
         initializeButtons();
         initializeFrame();
@@ -31,7 +35,11 @@ public class Simulator extends JFrame {
     }
 
     private void initializeMap() {
-        mMapPanel = new MapPanel(mSimulationGrid);
+        mMapPanel = new MapPanel(mSimulationGrid, mSimulationRobot);
+        mSimulationRobot.addObserver((Observer) mMapPanel);
+        mSimulationGrid.addObserver((Observer) mMapPanel);
+
+        /* wrap the panel into a FlowLayout to maintain its preferred size */
         JPanel wrapper = new JPanel(new FlowLayout());
         wrapper.add(mMapPanel);
         this.add(wrapper, BorderLayout.CENTER);
