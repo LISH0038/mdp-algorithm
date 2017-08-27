@@ -4,6 +4,7 @@ import model.entity.Grid;
 import model.entity.Robot;
 import view.Simulator;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -27,5 +28,4 @@ public class LoadMapButtonListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         System.out.println("LoadMap button pressed");
     }
-
 }

@@ -24,15 +24,15 @@ public class Robot extends Observable {
         return mHeading;
     }
 
-    public void move(int distance) {
+    public void move() {
         if (mHeading == NORTH)
-            mPosY -= distance;
+            mPosY--;
         else if (mHeading == SOUTH)
-            mPosY += distance;
+            mPosY++;
         else if (mHeading == WEST)
-            mPosX -= distance;
+            mPosX--;
         else if (mHeading == EAST)
-            mPosX += distance;
+            mPosX++;
         setChanged();
         notifyObservers();
     }

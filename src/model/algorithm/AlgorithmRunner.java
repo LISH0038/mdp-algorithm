@@ -6,6 +6,6 @@ import model.entity.Robot;
 /**
  * Created by koallen on 25/8/17.
  */
-public interface FastestPathAlgorithmRunner {
+public interface AlgorithmRunner {
     void run(Grid grid, Robot robot);
 }
