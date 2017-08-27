@@ -20,4 +20,5 @@ public class RobotConstants {
 
     public static final int LEFT = 4;
     public static final int RIGHT = 5;
+    public static final int MIDDLE = 6;
 }

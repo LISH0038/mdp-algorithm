@@ -1,5 +1,6 @@
 package model.entity;
 
+import java.util.List;
 import java.util.Observable;
 
 import static constant.RobotConstants.*;
@@ -11,6 +12,11 @@ public class Robot extends Observable {
     private int mPosX = START_POS_X;
     private int mPosY = START_POS_Y;
     private int mHeading = NORTH;
+    private List<Sensor> mSensors;
+
+    public Robot(List<Sensor> sensors) {
+        mSensors = sensors;
+    }
 
     public int getPosX() {
         return mPosX;
@@ -50,5 +56,9 @@ public class Robot extends Observable {
         mPosX = START_POS_X;
         mPosY = START_POS_Y;
         mHeading = NORTH;
+    }
+
+    public void sense() {
+
     }
 }
