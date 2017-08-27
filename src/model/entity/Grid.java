@@ -1,6 +1,5 @@
 package model.entity;
 
-import java.nio.channels.Channel;
 import java.util.Observable;
 
 import static constant.MapConstants.MAP_COLS;
@@ -21,6 +20,7 @@ public class Grid extends Observable {
                 cells[x][y] = new Cell();
             }
         }
+        reset();
     }
 
     public Cell[][] getCells() {
@@ -59,5 +59,19 @@ public class Grid extends Observable {
 
     public void loadFromDisk(String path) {
 
+    }
+
+    /**
+     * Set all cells to unexplored
+     */
+    public void reset() {
+        for (int x = 0; x < MAP_COLS; x++) {
+            for (int y = 0; y < MAP_ROWS; y++) {
+                if (!isInStartZone(x, y) && !isInEndZone(x, y))
+                    cells[x][y].setExplored(false);
+                else
+                    cells[x][y].setExplored(true);
+            }
+        }
     }
 }

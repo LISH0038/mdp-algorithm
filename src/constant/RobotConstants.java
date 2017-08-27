@@ -1,10 +1,9 @@
 package constant;
 
-import static constant.MapConstants.CELL_SIZE;
 import static constant.MapConstants.MAP_ROWS;
 
 /**
- * Created by koallen on 26/8/17.
+ * Robot related constants
  */
 public class RobotConstants {
     public static final int START_POS_X = 1;
@@ -15,7 +14,10 @@ public class RobotConstants {
     public static final int HEADING_PIXEL_SIZE = 8;
 
     public static final int NORTH = 0;
-    public static final int SOUTH = 1;
-    public static final int WEST = 2;
-    public static final int EAST = 3;
+    public static final int EAST = 1;
+    public static final int SOUTH = 2;
+    public static final int WEST = 3;
+
+    public static final int LEFT = 4;
+    public static final int RIGHT = 5;
 }

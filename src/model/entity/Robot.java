@@ -36,4 +36,19 @@ public class Robot extends Observable {
         setChanged();
         notifyObservers();
     }
+
+    public void turn(int direction) {
+        if (direction == LEFT)
+            mHeading = (mHeading - 1) % 4;
+        else if (direction == RIGHT)
+            mHeading = (mHeading + 1) % 4;
+        setChanged();
+        notifyObservers();
+    }
+
+    public void reset() {
+        mPosX = START_POS_X;
+        mPosY = START_POS_Y;
+        mHeading = NORTH;
+    }
 }

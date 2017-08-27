@@ -21,11 +21,11 @@ public class AppRunner {
 
             // controller
             // TODO: add them to the view
-            new CoverageLimitedButtonListener();
-            new ExplorationButtonListener();
-            new FastestPathButtonListener();
-            new LoadMapButtonListener();
-            new TimeLimitedButtonListener();
+            new CoverageLimitedButtonListener(simulator, grid, robot);
+            new ExplorationButtonListener(simulator, grid, robot);
+            new FastestPathButtonListener(simulator, grid, robot);
+            new LoadMapButtonListener(simulator, grid, robot);
+            new TimeLimitedButtonListener(simulator, grid, robot);
 
             simulator.setVisible(true);
             System.out.println("Simulator started.");

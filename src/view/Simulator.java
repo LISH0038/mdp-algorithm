@@ -1,10 +1,12 @@
 package view;
 
+import controller.CoverageLimitedButtonListener;
 import model.entity.Grid;
 import model.entity.Robot;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.util.Observer;
 
 /**
@@ -56,9 +58,9 @@ public class Simulator extends JFrame {
         bottomPanel.add(mRealRunCheckBox);
         bottomPanel.add(mExplorationButton);
         bottomPanel.add(mFastestPathButton);
-        bottomPanel.add(mLoadMapButton);
         bottomPanel.add(mTimeLimitedButton);
         bottomPanel.add(mCoverageLimitedButton);
+        bottomPanel.add(mLoadMapButton);
         this.add(bottomPanel, BorderLayout.PAGE_END);
 
         // set up the frame
@@ -67,5 +69,29 @@ public class Simulator extends JFrame {
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
+
+    public void addExplorationButtonListener(ActionListener actionListener) {
+        mExplorationButton.addActionListener(actionListener);
+    }
+
+    public void addFastestPathButtonListener(ActionListener actionListener) {
+        mFastestPathButton.addActionListener(actionListener);
+    }
+
+    public void addLoadMapButtonListener(ActionListener actionListener) {
+        mLoadMapButton.addActionListener(actionListener);
+    }
+
+    public void addTimeLimitedButtonListener(ActionListener actionListener) {
+        mTimeLimitedButton.addActionListener(actionListener);
+    }
+
+    public void addCoverageLimitedButtonListener(ActionListener actionListener) {
+        mCoverageLimitedButton.addActionListener(actionListener);
+    }
+
+    public boolean getIsRealRun() {
+        return mRealRunCheckBox.isSelected();
     }
 }
