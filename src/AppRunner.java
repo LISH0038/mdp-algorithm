@@ -20,6 +20,8 @@ public class AppRunner {
         SwingUtilities.invokeLater(() -> {
             // models
             Grid grid = new Grid();
+            grid.setIsObstacle(0, 3, true);
+            grid.setIsObstacle(1, 4, true);
             Sensor sensor1 = new Sensor(3, 0, 0, MIDDLE);
             Sensor sensor2 = new Sensor(3, 1, 0, MIDDLE);
             Sensor sensor3 = new Sensor(3, 2, 0, MIDDLE);

@@ -13,7 +13,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
     @Override
     public void run(Grid grid, Robot robot, boolean realRun) {
         System.out.println("Started exploration");
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             robot.sense();
             try {
                 Thread.sleep(200);
@@ -22,7 +22,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
             }
             if (robot.isObstacleAhead()) {
                 System.out.println("Obstacle ahead, stopping");
-                return;
+                robot.turn(RIGHT);
             }
             robot.move();
         }

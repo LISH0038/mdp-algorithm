@@ -58,11 +58,55 @@ public class Sensor {
     }
 
     public int getActualPosX() {
-        return mRobot.getPosX() + mPosX;
+        if (mRobot.getHeading() == NORTH) {
+            return getCorrectedRobotPosX() + mPosX;
+        } else if (mRobot.getHeading() == EAST) {
+            return getCorrectedRobotPosX() - mPosY;
+        } else if (mRobot.getHeading() == SOUTH) {
+            return getCorrectedRobotPosX() - mPosX;
+        } else if (mRobot.getHeading() == WEST) {
+            return getCorrectedRobotPosX() + mPosY;
+        }
+
+        return 0;
     }
 
     public int getActualPosY() {
-        return mRobot.getPosY() + mPosY;
+        if (mRobot.getHeading() == NORTH) {
+            return getCorrectedRobotPosY() + mPosY;
+        } else if (mRobot.getHeading() == EAST) {
+            return getCorrectedRobotPosY() + mPosX;
+        } else if (mRobot.getHeading() == SOUTH) {
+            return getCorrectedRobotPosY() - mPosY;
+        } else if (mRobot.getHeading() == WEST) {
+            return getCorrectedRobotPosY() - mPosX;
+        }
+
+        return 0;
+    }
+
+    /**
+     * As the sensor location is relative to the robot, the corrected robot location
+     * (i.e. considering heading) needs to be calculated to be the base location for
+     * calculating sensor location
+     * @return
+     */
+    public int getCorrectedRobotPosX() {
+        if (mRobot.getHeading() == EAST || mRobot.getHeading() == SOUTH)
+            return mRobot.getPosX() + 2;
+        return mRobot.getPosX();
+    }
+
+    /**
+     * As the sensor location is relative to the robot, the corrected robot location
+     * (i.e. considering heading) needs to be calculated to be the base location for
+     * calculating sensor location
+     * @return
+     */
+    public int getCorrectedRobotPosY() {
+        if (mRobot.getHeading() == SOUTH || mRobot.getHeading() == WEST)
+            return mRobot.getPosY() + 2;
+        return mRobot.getPosY();
     }
 
     public int getRange() {
