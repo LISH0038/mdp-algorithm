@@ -1,7 +1,7 @@
 package controller;
 
 import model.algorithm.AlgorithmRunner;
-import model.algorithm.SimulatedExplorationAlgorithmRunner;
+import model.algorithm.ExplorationAlgorithmRunner;
 import model.entity.Grid;
 import model.entity.Robot;
 import view.Simulator;
@@ -36,8 +36,8 @@ public class ExplorationButtonListener implements ActionListener {
 
         @Override
         protected Integer doInBackground() throws Exception {
-            AlgorithmRunner algorithmRunner = new SimulatedExplorationAlgorithmRunner();
-            algorithmRunner.run(mGrid, mRobot);
+            AlgorithmRunner algorithmRunner = new ExplorationAlgorithmRunner();
+            algorithmRunner.run(mGrid, mRobot, mView.getIsRealRun());
             return 1;
         }
     }

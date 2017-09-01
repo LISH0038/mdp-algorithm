@@ -6,6 +6,9 @@ import model.entity.Robot;
 /**
  * Created by koallen on 25/8/17.
  */
-public interface FastestPathAlgorithmRunner {
-    void run(Grid grid, Robot robot);
+public class FastestPathAlgorithmRunner implements AlgorithmRunner {
+    @Override
+    public void run(Grid grid, Robot robot, boolean realRun) {
+        System.out.println("Fastest path algorithm started");
+    }
 }

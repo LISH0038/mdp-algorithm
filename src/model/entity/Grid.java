@@ -45,13 +45,29 @@ public class Grid extends Observable {
         }
     }
 
+    public boolean getIsObstacle(int x, int y) {
+        if (isOutOfArena(x, y) || cells[x][y].getIsObstacle())
+            return true;
+        return false;
+    }
+
+    public boolean isOutOfArena(int x, int y) {
+        if (x < 0 || y < 0 || x >= MAP_COLS || y >= MAP_ROWS)
+            return true;
+        return false;
+    }
+
     public void setIsObstacle(int x, int y, boolean isObstacle) {
+        if (isOutOfArena(x, y))
+            return;
         cells[x][y].setIsObstacle(isObstacle);
         setChanged();
         notifyObservers();
     }
 
     public void setExplored(int x, int y, boolean explored) {
+        if (isOutOfArena(x, y))
+            return;
         cells[x][y].setExplored(explored);
         setChanged();
         notifyObservers();

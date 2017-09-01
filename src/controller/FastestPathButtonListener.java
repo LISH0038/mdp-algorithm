@@ -1,9 +1,12 @@
 package controller;
 
+import model.algorithm.AlgorithmRunner;
+import model.algorithm.FastestPathAlgorithmRunner;
 import model.entity.Grid;
 import model.entity.Robot;
 import view.Simulator;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -26,6 +29,16 @@ public class FastestPathButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("Fastest path button pressed");
+        new FastestPathWorker().execute();
     }
 
+    class FastestPathWorker extends SwingWorker<Integer, Integer> {
+
+        @Override
+        protected Integer doInBackground() throws Exception {
+            AlgorithmRunner algorithmRunner = new FastestPathAlgorithmRunner();
+            algorithmRunner.run(mGrid, mRobot, mView.getIsRealRun());
+            return 1;
+        }
+    }
 }

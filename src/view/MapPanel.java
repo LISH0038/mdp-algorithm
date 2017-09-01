@@ -65,28 +65,28 @@ public class MapPanel extends JPanel implements Observer {
 
         /* paint robot */
         g2d.setColor(Color.MAGENTA);
-        g2d.fillOval((mRobot.getPosX() - PAINT_POS_OFFSET) * CELL_SIZE + PAINT_PIXEL_OFFSET,
-                (mRobot.getPosY() - PAINT_POS_OFFSET) * CELL_SIZE + PAINT_PIXEL_OFFSET,
+        g2d.fillOval(mRobot.getPosX() * CELL_SIZE + PAINT_PIXEL_OFFSET,
+                mRobot.getPosY() * CELL_SIZE + PAINT_PIXEL_OFFSET,
                CELL_SIZE * ROBOT_SIZE - 2 * PAINT_PIXEL_OFFSET,
                 CELL_SIZE * ROBOT_SIZE - 2 * PAINT_PIXEL_OFFSET);
 
         /* paint robot heading */
         g2d.setColor(Color.WHITE);
         if (mRobot.getHeading() == NORTH) {
-            g2d.fillOval(mRobot.getPosX() * CELL_SIZE + (CELL_SIZE - HEADING_PIXEL_SIZE) / 2,
-                    mRobot.getPosY() * CELL_SIZE - (CELL_SIZE + HEADING_PIXEL_SIZE) / 2,
+            g2d.fillOval((mRobot.getPosX() + 1) * CELL_SIZE + (CELL_SIZE - HEADING_PIXEL_SIZE) / 2,
+                    mRobot.getPosY() * CELL_SIZE + PAINT_PIXEL_OFFSET,
                     HEADING_PIXEL_SIZE, HEADING_PIXEL_SIZE);
         } else if (mRobot.getHeading() == SOUTH) {
-            g2d.fillOval(mRobot.getPosX() * CELL_SIZE + (CELL_SIZE - HEADING_PIXEL_SIZE) / 2,
-                    (mRobot.getPosY() + 1) * CELL_SIZE + (CELL_SIZE - HEADING_PIXEL_SIZE) / 2,
+            g2d.fillOval((mRobot.getPosX() + 1) * CELL_SIZE + (CELL_SIZE - HEADING_PIXEL_SIZE) / 2,
+                    (mRobot.getPosY() + 2) * CELL_SIZE + CELL_SIZE - HEADING_PIXEL_SIZE - PAINT_PIXEL_OFFSET,
                     HEADING_PIXEL_SIZE, HEADING_PIXEL_SIZE);
         } else if (mRobot.getHeading() == WEST) {
-            g2d.fillOval(mRobot.getPosX() * CELL_SIZE - (CELL_SIZE + HEADING_PIXEL_SIZE) / 2,
-                    mRobot.getPosY() * CELL_SIZE + (CELL_SIZE - HEADING_PIXEL_SIZE) / 2,
+            g2d.fillOval(mRobot.getPosX() * CELL_SIZE + PAINT_PIXEL_OFFSET,
+                    (mRobot.getPosY() + 1) * CELL_SIZE + (CELL_SIZE - HEADING_PIXEL_SIZE) / 2,
                     HEADING_PIXEL_SIZE, HEADING_PIXEL_SIZE);
         } else if (mRobot.getHeading() == EAST) {
-            g2d.fillOval((mRobot.getPosX() + 1) * CELL_SIZE + (CELL_SIZE - HEADING_PIXEL_SIZE) / 2,
-                    mRobot.getPosY() * CELL_SIZE + (CELL_SIZE - HEADING_PIXEL_SIZE) / 2,
+            g2d.fillOval((mRobot.getPosX() + 2) * CELL_SIZE + CELL_SIZE - HEADING_PIXEL_SIZE - PAINT_PIXEL_OFFSET,
+                    (mRobot.getPosY() + 1) * CELL_SIZE + (CELL_SIZE - HEADING_PIXEL_SIZE) / 2,
                     HEADING_PIXEL_SIZE, HEADING_PIXEL_SIZE);
         }
     }

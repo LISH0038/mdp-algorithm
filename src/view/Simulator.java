@@ -1,6 +1,5 @@
 package view;
 
-import controller.CoverageLimitedButtonListener;
 import model.entity.Grid;
 import model.entity.Robot;
 
