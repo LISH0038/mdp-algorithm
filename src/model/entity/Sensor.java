@@ -47,7 +47,7 @@ public class Sensor {
     public int getActualHeading() {
         int actualDirection = -1;
         if (mDirection == LEFT) {
-            actualDirection = (mRobot.getHeading() - 1) % 4;
+            actualDirection = (mRobot.getHeading() + 3) % 4; // java % is remainder!
         } else if (mDirection == MIDDLE) {
             actualDirection = mRobot.getHeading();
         } else if (mDirection == RIGHT) {

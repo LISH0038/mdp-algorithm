@@ -3,6 +3,7 @@ package model.algorithm;
 import model.entity.Grid;
 import model.entity.Robot;
 
+import static constant.RobotConstants.LEFT;
 import static constant.RobotConstants.RIGHT;
 
 /**
@@ -15,14 +16,19 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         System.out.println("Started exploration");
         for (int i = 0; i < 100; i++) {
             robot.sense();
+            while (robot.isObstacleAhead()) {
+                System.out.println("Obstacle ahead, stopping");
+                try {
+                    Thread.sleep(200);
+                } catch (Exception e) {
+
+                }
+                robot.turn(LEFT);
+            }
             try {
                 Thread.sleep(200);
             } catch (Exception e) {
 
-            }
-            if (robot.isObstacleAhead()) {
-                System.out.println("Obstacle ahead, stopping");
-                robot.turn(RIGHT);
             }
             robot.move();
         }

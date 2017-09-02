@@ -26,11 +26,13 @@ public class AppRunner {
             Sensor sensor2 = new Sensor(3, 1, 0, MIDDLE);
             Sensor sensor3 = new Sensor(3, 2, 0, MIDDLE);
             Sensor sensor4 = new Sensor(6, 2, 0, RIGHT);
+            Sensor sensor5 = new Sensor(3, 0, 0, LEFT);
             List<Sensor> sensors = new ArrayList<>();
             sensors.add(sensor1);
             sensors.add(sensor2);
             sensors.add(sensor3);
             sensors.add(sensor4);
+            sensors.add(sensor5);
             Robot robot = new Robot(grid, sensors);
 
             // view

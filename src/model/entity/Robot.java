@@ -70,7 +70,7 @@ public class Robot extends Observable {
 
     public void turn(int direction) {
         if (direction == LEFT)
-            mHeading = (mHeading - 1) % 4;
+            mHeading = (mHeading + 3) % 4;  // java % is remainder!
         else if (direction == RIGHT)
             mHeading = (mHeading + 1) % 4;
         setChanged();
