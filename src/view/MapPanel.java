@@ -9,9 +9,7 @@ import java.awt.*;
 import java.util.Observable;
 import java.util.Observer;
 
-import static constant.MapConstants.CELL_SIZE;
-import static constant.MapConstants.MAP_COLS;
-import static constant.MapConstants.MAP_ROWS;
+import static constant.MapConstants.*;
 import static constant.RobotConstants.*;
 
 /**
@@ -93,7 +91,7 @@ public class MapPanel extends JPanel implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        System.out.println("Map updated, repainting");
+        //System.out.println("Map updated, repainting");
         this.repaint();
     }
 }
