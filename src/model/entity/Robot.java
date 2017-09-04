@@ -119,21 +119,13 @@ public class Robot extends Observable {
     public void move() {
         // TODO: make sure it won't go beyond the arena
         if (mHeading == NORTH) { // Limit position to prevent wall crash
-            if (this.getPosY() > 1) {
                 mPosY--;
-            }
-        } else if (mHeading == SOUTH) {
-            if (this.getPosY() < 18) { // Limit position to prevent wall crash
+        } else if (mHeading == SOUTH) {// Limit position to prevent wall crash
                 mPosY++;
-            }
         } else if (mHeading == WEST) { // Limit position to prevent wall crash
-            if (this.getPosX() > 1) {
                 mPosX--;
-            }
         } else if (mHeading == EAST) { // Limit position to prevent wall crash
-            if (this.getPosX() < 13) {
                 mPosX++;
-            }
         }
         setChanged();
         notifyObservers();
