@@ -82,6 +82,9 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
             }
             robot.move();
         }
+        
+        System.out.println("EXPLORATION COMPLETED!");
+        System.out.println("PERCENTAGE OF AREA EXPLORED: " + grid.checkExploredPercentage() + "%!");
     }
 
     public void runExplorationAlgorithmFastest(Grid grid, Robot robot) {
