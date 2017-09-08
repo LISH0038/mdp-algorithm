@@ -169,6 +169,8 @@ public class Robot extends Observable {
         mPosX = START_POS_X;
         mPosY = START_POS_Y;
         mHeading = NORTH;
+        setChanged();
+        notifyObservers();
     }
 
     private void updateMap(int returnedDistance, int heading, int range, int x, int y) {

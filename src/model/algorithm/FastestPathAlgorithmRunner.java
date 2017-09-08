@@ -56,37 +56,40 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         System.out.println("Fastest path algorithm started");
 
         robot.reset();
-        while (!openSet.isEmpty()) {
-            Cell current = getCurrent();
-            if (current.getX() == GOAL_X && current.getY() == GOAL_Y) {
-                System.out.println("Reached goal");
-                reconstructPath(grid ,robot, current);
-                return;
+        System.out.println("Reset!");
+        try {
+            while (!openSet.isEmpty()) {
+                Cell current = getCurrent();
+                System.out.println("Current: " + current.getX() + ", " + current.getY());
+                if (current.getX() == GOAL_X && current.getY() == GOAL_Y) {
+                    System.out.println("Reached goal");
+                    reconstructPath(grid, robot, current);
+                    return;
+                }
+
+                openSet.remove(current);
+                closedSet[current.getX()][current.getY()] = true;
+
+                for (Cell neighbor : generateNeighbor(grid, current)) {
+                    System.out.println("Begin updating");
+                    if (closedSet[neighbor.getX()][neighbor.getY()])
+                        continue;
+
+                    if (!openSet.contains(neighbor))
+                        openSet.add(neighbor);
+
+                    int tentativeGScore = gScore[current.getX()][current.getY()] + 1; // TODO: should this always be 1?
+                    if (tentativeGScore >= gScore[neighbor.getX()][neighbor.getY()])
+                        continue;
+
+                    cameFrom.put(neighbor, current);
+                    gScore[neighbor.getX()][neighbor.getY()] = tentativeGScore;
+                    fScore[neighbor.getX()][neighbor.getY()] = tentativeGScore + estimateDistanceToGoal(neighbor.getX(), neighbor.getY(), GOAL_X, GOAL_Y);
+                    System.out.println("Finish updating");
+                }
             }
-
-            openSet.remove(current);
-            closedSet[current.getX()][current.getY()] = true;
-
-            for (Cell neighbor : generateNeighbor(current)) {
-                if (closedSet[neighbor.getX()][neighbor.getY()])
-                    continue;
-
-                if (!openSet.contains(neighbor))
-                    openSet.add(neighbor);
-
-                int tentativeGScore = gScore[current.getX()][current.getY()] + 1; // TODO: should this always be 1?
-                if (tentativeGScore >= gScore[neighbor.getX()][neighbor.getY()])
-                    continue;
-
-                cameFrom.put(neighbor, current);
-                gScore[neighbor.getX()][neighbor.getY()] = tentativeGScore;
-                fScore[neighbor.getX()][neighbor.getY()] = tentativeGScore + estimateDistanceToGoal(neighbor.getX(), neighbor.getY(), GOAL_X, GOAL_Y);
-            }
-
-            //printMap();
-            //try {
-            //    Thread.sleep(200);
-            //} catch (Exception e) {}
+        } catch (Exception e) {
+            System.out.println(e.toString());
         }
     }
 
@@ -153,17 +156,62 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         }
     }
 
-    private List<Cell> generateNeighbor(Cell current) {
-        // TODO: make sure the correct neighbor is generated (check by robot size)
+    private List<Cell> generateNeighbor(Grid grid, Cell current) {
+        boolean left = true, right = true, front = true, back = true;
         List<Cell> neighbors = new ArrayList<>();
-        if (current.getX() > 0)
+
+        // check left
+        for (int i = -1; i <= 1; ++i) {
+            if (grid.isOutOfArena(current.getX() - 1, current.getY() + i + 1))
+                left = false;
+            if (grid.getIsObstacle(current.getX() - 1, current.getY() + i + 1))
+                left = false;
+        }
+        if (current.getX() <= 0)
+            left = false;
+        if (left)
             neighbors.add(cells[current.getX() - 1][current.getY()]);
-        if (current.getX() < MAP_COLS - 3)
+
+        // check right
+        for (int i = -1; i <= 1; ++i) {
+            if (grid.isOutOfArena(current.getX() + 3, current.getY() + i + 1))
+                right = false;
+            if (grid.getIsObstacle(current.getX() + 3, current.getY() + i + 1))
+                right = false;
+        }
+        if (current.getX() >= MAP_COLS - 3)
+            right = false;
+        if (right)
             neighbors.add(cells[current.getX() + 1][current.getY()]);
-        if (current.getY() > 0)
+
+        // check front
+        for (int i = -1; i <= 1; ++i) {
+            if (grid.isOutOfArena(current.getX() + i + 1, current.getY() - 1))
+                front = false;
+            if (grid.getIsObstacle(current.getX() + i + 1, current.getY() - 1))
+                front = false;
+        }
+        if (current.getY() <= 0)
+            front = false;
+        if (front)
             neighbors.add(cells[current.getX()][current.getY() - 1]);
-        if (current.getY() < MAP_ROWS - 3)
+
+        // check back
+        for (int i = -1; i <= 1; ++i) {
+            if (grid.isOutOfArena(current.getX() + i + 1, current.getY() + 3))
+                back = false;
+            if (grid.getIsObstacle(current.getX() + i + 1, current.getY() + 3))
+                back = false;
+        }
+        if (current.getY() >= MAP_ROWS - 3)
+            back = false;
+        if (back)
             neighbors.add(cells[current.getX()][current.getY() + 1]);
+
+        if (neighbors.size() == 0)
+            System.out.println("No neighbors");
+        System.out.println("Generated neighbors");
+
         return neighbors;
     }
 
