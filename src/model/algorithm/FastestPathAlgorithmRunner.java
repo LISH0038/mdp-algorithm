@@ -1,93 +1,170 @@
 package model.algorithm;
 
+import model.entity.Cell;
 import model.entity.Grid;
 import model.entity.Robot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import static constant.MapConstants.MAP_COLS;
+import static constant.MapConstants.MAP_ROWS;
 import static constant.RobotConstants.*;
 
 /**
  * Created by koallen on 25/8/17.
  */
 public class FastestPathAlgorithmRunner implements AlgorithmRunner {
+
+    private static final int INFINITY = 1000000;
+    private static final int START_X = 0;
+    private static final int START_Y = 17;
+    private static final int GOAL_X = 12;
+    private static final int GOAL_Y = 0;
+    private boolean[][] closedSet;
+    private List<Cell> openSet;
+    private HashMap<Cell, Cell> cameFrom;
+    private int[][] gScore;
+    private int[][] fScore;
+    private Cell[][] cells;
+
+    public FastestPathAlgorithmRunner() {
+        closedSet = new boolean[MAP_COLS - 2][MAP_ROWS - 2];
+        openSet = new ArrayList<>();
+        cameFrom = new HashMap<>();
+        gScore = new int[MAP_COLS - 2][MAP_ROWS - 2];
+        fScore = new int[MAP_COLS - 2][MAP_ROWS - 2];
+        cells = new Cell[MAP_COLS - 2][MAP_ROWS - 2];
+
+        for (int x = 0; x < MAP_COLS - 2; x++)
+            for (int y = 0; y < MAP_ROWS - 2; y++) {
+                gScore[x][y] = INFINITY;
+                fScore[x][y] = INFINITY;
+                closedSet[x][y] = false;
+                cells[x][y] = new Cell(x, y);
+            }
+        gScore[START_X][START_Y] = 0;
+        fScore[START_X][START_Y] = estimateDistanceToGoal(START_X, START_Y, GOAL_X, GOAL_Y);
+        cells[START_X][START_Y].setDistance(fScore[START_X][START_Y]);
+        openSet.add(cells[START_X][START_Y]);
+    }
+
     @Override
     public void run(Grid grid, Robot robot, boolean realRun) {
         System.out.println("Fastest path algorithm started");
-        // functions:
-        // - estimate h(n)
-        //
-        int pathCost = 0, estimatedCost = 0, totalCost = 0;
-        int totalCostMove, totalCostTurningLeft = 100000, totalCostTurningRight = 100000;
-        int newHeading;
-        int goalX = MAP_COLS - 2, goalY = 1;
-        List<String> actions = new ArrayList<>();
+
         robot.reset();
-
-        // main loop of the A* search
-        while (!isRobotInGoalZone(robot.getCenterPosX(), robot.getCenterPosY())) {
-            System.out.println("Robot's current position: (" + robot.getCenterPosX() + "," + robot.getCenterPosY() + ")");
-            // if move forward
-            if (robot.isObstacleAhead()) {
-                totalCostMove = 100000;
-            } else {
-                int nextX = robot.getCenterPosX(), nextY = robot.getCenterPosY();
-                if (robot.getHeading() == NORTH)
-                    nextY--;
-                else if (robot.getHeading() == SOUTH)
-                    nextY++;
-                else if (robot.getHeading() == WEST)
-                    nextX--;
-                else if (robot.getHeading() == EAST)
-                    nextX++;
-                int penaltyMove = isObstacleOnFrontAndSide(grid, robot.getHeading(), nextX, nextY) ? 10 : 0;
-                totalCostMove = pathCost + 1 // 1 for moving forward
-                        + estimateDistanceToGoal(nextX, nextY, goalX, goalY)
-                        + penaltyMove;
+        while (!openSet.isEmpty()) {
+            Cell current = getCurrent();
+            if (current.getX() == GOAL_X && current.getY() == GOAL_Y) {
+                System.out.println("Reached goal");
+                reconstructPath(grid ,robot, current);
+                return;
             }
 
+            openSet.remove(current);
+            closedSet[current.getX()][current.getY()] = true;
 
-            // if turn left
-            newHeading = (robot.getHeading() + 3) % 4;
-            int penaltyLeft = isObstacleOnFrontAndSide(grid, newHeading, robot.getCenterPosX(), robot.getCenterPosY()) ? 10 : 0;
-            if (newHeading == NORTH || newHeading == EAST)
-                penaltyLeft += 5;
-            else
-                penaltyLeft += 10;
-            totalCostTurningLeft = pathCost
-                    + estimateDistanceToGoal(robot.getCenterPosX(), robot.getCenterPosY(), goalX, goalY)
-                    + penaltyLeft;
+            for (Cell neighbor : generateNeighbor(current)) {
+                if (closedSet[neighbor.getX()][neighbor.getY()])
+                    continue;
 
-            // if turn right
-            newHeading = (robot.getHeading() + 1) % 4;
-            int penaltyRight = isObstacleOnFrontAndSide(grid, newHeading, robot.getCenterPosX(), robot.getCenterPosY()) ? 10 : 0;
-            if (newHeading == NORTH || newHeading == EAST)
-                penaltyRight += 5;
-            else
-                penaltyRight += 10;
-            totalCostTurningRight = pathCost
-                    + estimateDistanceToGoal(robot.getCenterPosX(), robot.getCenterPosY(), goalX, goalY)
-                    + penaltyRight;
+                if (!openSet.contains(neighbor))
+                    openSet.add(neighbor);
 
-            try {
-                Thread.sleep(500);
-            } catch (Exception e) {
+                int tentativeGScore = gScore[current.getX()][current.getY()] + 1; // TODO: should this always be 1?
+                if (tentativeGScore >= gScore[neighbor.getX()][neighbor.getY()])
+                    continue;
 
+                cameFrom.put(neighbor, current);
+                gScore[neighbor.getX()][neighbor.getY()] = tentativeGScore;
+                fScore[neighbor.getX()][neighbor.getY()] = tentativeGScore + estimateDistanceToGoal(neighbor.getX(), neighbor.getY(), GOAL_X, GOAL_Y);
             }
-            if (totalCostMove <= totalCostTurningLeft && totalCostMove <= totalCostTurningRight) {
-                robot.move();
-                //actions.add("m");
-                pathCost++;
-            } else if (totalCostTurningRight < totalCostMove && totalCostTurningRight < totalCostTurningLeft) {
-                robot.turn(RIGHT);
-            }
-            else if (totalCostTurningLeft < totalCostMove && totalCostTurningLeft < totalCostMove) {
-            robot.turn(LEFT);
-            //actions.add("l");
-            }
+
+            //printMap();
+            //try {
+            //    Thread.sleep(200);
+            //} catch (Exception e) {}
         }
+    }
+
+    private void printMap() {
+        for (int y = 0; y < MAP_ROWS - 2; y++) {
+            for (int x = 0; x < MAP_COLS - 2; x++) {
+                System.out.print(fScore[x][y] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    private Cell getCurrent() {
+        Cell minCell = null;
+        int minF = INFINITY;
+        for (Cell cell : openSet) {
+           if (fScore[cell.getX()][cell.getY()] < minF) {
+               minF = fScore[cell.getX()][cell.getY()];
+               minCell = cell;
+           }
+        }
+
+        return minCell;
+    }
+
+    private void reconstructPath(Grid grid, Robot robot, Cell current) {
+        // construct the path first
+        List<Cell> path = new LinkedList<>();
+        path.add(current);
+        while (cameFrom.get(current) != null) {
+            current = cameFrom.get(current);
+            path.add(0, current);
+        }
+        path.remove(0); // remove the starting point
+
+        // convert path to robot movement
+        // TODO: encode the actions as a string for sending to actual robot
+        //List<String> actions = new ArrayList<>();
+        for (Cell cell : path) {
+            // see if we need to turn
+            int nextHeading = 0;
+            if (robot.getCenterPosX() < cell.getX() + 1)
+                nextHeading = EAST;
+            else if (robot.getCenterPosX() > cell.getX() + 1)
+                nextHeading = WEST;
+            else if (robot.getCenterPosY() < cell.getY() + 1)
+                nextHeading = SOUTH;
+            else if (robot.getCenterPosY() > cell.getY() + 1)
+                nextHeading = NORTH;
+
+            if (nextHeading != robot.getHeading()) {
+                try {
+                    Thread.sleep(200);
+                } catch (Exception e) {}
+                if ((robot.getHeading() + 1) % 4 == nextHeading)
+                    robot.turn(RIGHT);
+                else
+                    robot.turn(LEFT);
+            }
+            try {
+                Thread.sleep(200);
+            } catch (Exception e) {}
+            robot.move();
+        }
+    }
+
+    private List<Cell> generateNeighbor(Cell current) {
+        // TODO: make sure the correct neighbor is generated (check by robot size)
+        List<Cell> neighbors = new ArrayList<>();
+        if (current.getX() > 0)
+            neighbors.add(cells[current.getX() - 1][current.getY()]);
+        if (current.getX() < MAP_COLS - 3)
+            neighbors.add(cells[current.getX() + 1][current.getY()]);
+        if (current.getY() > 0)
+            neighbors.add(cells[current.getX()][current.getY() - 1]);
+        if (current.getY() < MAP_ROWS - 3)
+            neighbors.add(cells[current.getX()][current.getY() + 1]);
+        return neighbors;
     }
 
     /**
@@ -95,7 +172,11 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
      * The estimation is based on the Manhattan distance
      */
     private int estimateDistanceToGoal(int curX, int curY, int goalX, int goalY) {
-        return Math.abs(goalX - curX) + Math.abs(goalY - curY);
+        int distance = Math.abs(goalX - curX) + Math.abs(goalY - curY);
+        if (curX != goalX && curY != goalY)
+            distance++;
+
+        return distance;
     }
 
     private boolean isRobotInGoalZone(int x, int y) {
