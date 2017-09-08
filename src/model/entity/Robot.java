@@ -46,41 +46,121 @@ public class Robot extends Observable {
     public boolean isObstacleAhead() {
         for (int i = 0; i < ROBOT_SIZE; i++) {
             if (mHeading == NORTH) {
-                if (mGrid.getIsObstacle(mPosX + i, mPosY - 1))
+                // DIRECTLY IN FRONT OF ROBOT
+                if (mGrid.getIsObstacle(mPosX + i, mPosY - 1)) {
                     return true;
+                }
             } else if (mHeading == SOUTH) {
-                if (mGrid.getIsObstacle(mPosX + i, mPosY + 3))
+                // DIRECTLY IN FRONT OF ROBOT
+                if (mGrid.getIsObstacle(mPosX + i, mPosY + 3)) {
                     return true;
+                }
             } else if (mHeading == EAST) {
-                if (mGrid.getIsObstacle(mPosX + 3, mPosY + i))
+                // DIRECTLY IN FRONT OF ROBOT
+                if (mGrid.getIsObstacle(mPosX + 3, mPosY + i)) {
                     return true;
+                }
             } else if (mHeading == WEST) {
-                if (mGrid.getIsObstacle(mPosX - 1, mPosY + i))
+                // DIRECTLY IN FRONT OF ROBOT
+                if (mGrid.getIsObstacle(mPosX - 1, mPosY + i)) {
                     return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isObstacleRight() {
+        for (int i = 0; i < ROBOT_SIZE; i++) {
+            if (mHeading == NORTH) {
+                // DIRECTLY BESIDE OF ROBOT
+                if (mGrid.getIsObstacle(mPosX + 3, mPosY + i)) {
+                    return true;
+                }
+            } else if (mHeading == SOUTH) {
+                // DIRECTLY BESIDE OF ROBOT
+                if (mGrid.getIsObstacle(mPosX - 1, mPosY + i)) {
+                    return true;
+                }
+            } else if (mHeading == EAST) {
+                // DIRECTLY BESIDE OF ROBOT
+                if (mGrid.getIsObstacle(mPosX + i, mPosY + 3)) {
+                    return true;
+                }
+            } else if (mHeading == WEST) {
+                // DIRECTLY BESIDE OF ROBOT
+                if (mGrid.getIsObstacle(mPosX + i, mPosY - 1)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isObstacleLeft() {
+        for (int i = 0; i < ROBOT_SIZE; i++) {
+            if (mHeading == NORTH) {
+                // DIRECTLY BESIDE OF ROBOT
+                if (mGrid.getIsObstacle(mPosX - 1, mPosY + i)) {
+                    return true;
+                }
+            } else if (mHeading == SOUTH) {
+                // DIRECTLY BESIDE OF ROBOT
+                if (mGrid.getIsObstacle(mPosX + 3, mPosY + i)) {
+                    return true;
+                }
+            } else if (mHeading == EAST) {
+                // DIRECTLY BESIDE OF ROBOT
+                if (mGrid.getIsObstacle(mPosX + i, mPosY - 1)) {
+                    return true;
+                }
+            } else if (mHeading == WEST) {
+                // DIRECTLY BESIDE OF ROBOT
+                if (mGrid.getIsObstacle(mPosX + i, mPosY + 3)) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
     public void move() {
-        // TODO: make sure it won't go beyong the arena
-        if (mHeading == NORTH)
-            mPosY--;
-        else if (mHeading == SOUTH)
-            mPosY++;
-        else if (mHeading == WEST)
-            mPosX--;
-        else if (mHeading == EAST)
-            mPosX++;
+        // TODO: make sure it won't go beyond the arena
+        if (mHeading == NORTH) { // Limit position to prevent wall crash
+                mPosY--;
+        } else if (mHeading == SOUTH) {// Limit position to prevent wall crash
+                mPosY++;
+        } else if (mHeading == WEST) { // Limit position to prevent wall crash
+                mPosX--;
+        } else if (mHeading == EAST) { // Limit position to prevent wall crash
+                mPosX++;
+        }
         setChanged();
         notifyObservers();
     }
 
     public void turn(int direction) {
-        if (direction == LEFT)
-            mHeading = (mHeading + 3) % 4;  // java % is remainder!
-        else if (direction == RIGHT)
+        /*
+        NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3, LEFT = 4, RIGHT = 5
+         */
+        if (direction == LEFT) {
+            /*
+            NORTH BECOMES WEST
+            WEST BECOMES SOUTH
+            SOUTH BECOMES EAST
+            EAST BECOMES NORTH
+             */
+            mHeading += 4;
+            mHeading = (mHeading - 1) % 4;
+        } else if (direction == RIGHT) {
+            /*
+            NORTH BECOMES EAST
+            EAST BECOMES SOUTH
+            SOUTH BECOMES WEST
+            WEST BECOMES NORTH
+             */
             mHeading = (mHeading + 1) % 4;
+        }
         setChanged();
         notifyObservers();
     }
@@ -107,15 +187,19 @@ public class Robot extends Observable {
                 xToUpdate = xToUpdate + 1;
             }
             mGrid.setExplored(xToUpdate, yToUpdate, true);
-            if (i == distance && obstacleAhead)
+            if (i == distance && obstacleAhead) {
                 mGrid.setIsObstacle(xToUpdate, yToUpdate, true);
-            else
+            } else {
                 mGrid.setIsObstacle(xToUpdate, yToUpdate, false);
+            }
         }
     }
 
     public void sense() {
         for (Sensor sensor : mSensors) {
+            /*
+            SENSE RETURNS 0 IF NO OBSTACLES IS DETECTED
+             */
             int returnedDistance = sensor.sense(mGrid);
             int heading = sensor.getActualHeading();
             int range = sensor.getRange();

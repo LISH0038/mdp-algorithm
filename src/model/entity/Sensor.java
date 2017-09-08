@@ -45,15 +45,17 @@ public class Sensor {
     }
 
     public int getActualHeading() {
+        /*
+        NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3
+         */
         int actualDirection = -1;
         if (mDirection == LEFT) {
-            actualDirection = (mRobot.getHeading() + 3) % 4; // java % is remainder!
+            actualDirection = (mRobot.getHeading() + 3) % 4;
         } else if (mDirection == MIDDLE) {
             actualDirection = mRobot.getHeading();
         } else if (mDirection == RIGHT) {
             actualDirection = (mRobot.getHeading() + 1) % 4;
         }
-
         return actualDirection;
     }
 
@@ -67,7 +69,6 @@ public class Sensor {
         } else if (mRobot.getHeading() == WEST) {
             return getCorrectedRobotPosX() + mPosY;
         }
-
         return 0;
     }
 
@@ -81,7 +82,6 @@ public class Sensor {
         } else if (mRobot.getHeading() == WEST) {
             return getCorrectedRobotPosY() - mPosX;
         }
-
         return 0;
     }
 
@@ -92,6 +92,11 @@ public class Sensor {
      * @return
      */
     public int getCorrectedRobotPosX() {
+        /*
+         * ROBOT'S MOST WEST POINT IN THE ARENA
+         * THEREFORE, MUST ADD 2 WHEN FACING EAST (FOR SENSORS IN MIDDLE)
+         * THEREFORE, MUST ADD 2 WHEN FACING SOUTH (FOR SENSORS IN RIGHT)
+         */
         if (mRobot.getHeading() == EAST || mRobot.getHeading() == SOUTH)
             return mRobot.getPosX() + 2;
         return mRobot.getPosX();
@@ -104,6 +109,11 @@ public class Sensor {
      * @return
      */
     public int getCorrectedRobotPosY() {
+        /*
+         * ROBOT'S MOST NORTH POINT IN THE ARENA
+         * THEREFORE, MUST ADD 2 WHEN FACING SOUTH (FOR SENSORS IN MIDDLE)
+         * THEREFORE, MUST ADD 2 WHEN FACING WEST (FOR SENSORS IN RIGHT)
+         */
         if (mRobot.getHeading() == SOUTH || mRobot.getHeading() == WEST)
             return mRobot.getPosY() + 2;
         return mRobot.getPosY();

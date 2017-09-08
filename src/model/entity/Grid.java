@@ -2,9 +2,7 @@ package model.entity;
 
 import java.util.Observable;
 
-import static constant.MapConstants.MAP_COLS;
-import static constant.MapConstants.MAP_ROWS;
-import static constant.MapConstants.ZONE_SIZE;
+import static constant.MapConstants.*;
 
 /**
  * Created by koallen on 25/8/17.
@@ -28,33 +26,21 @@ public class Grid extends Observable {
     }
 
     public static boolean isInStartZone(int x, int y) {
-        if (x < ZONE_SIZE && x >= 0
-                && y < MAP_ROWS && y >= MAP_ROWS - ZONE_SIZE) {
-            return true;
-        } else {
-            return false;
-        }
+        return x < ZONE_SIZE && x >= 0
+                && y < MAP_ROWS && y >= MAP_ROWS - ZONE_SIZE;
     }
 
     public static boolean isInEndZone(int x, int y) {
-        if (x < MAP_COLS && x >= MAP_COLS - ZONE_SIZE
-                && y < ZONE_SIZE && y >= 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return x < MAP_COLS && x >= MAP_COLS - ZONE_SIZE
+                && y < ZONE_SIZE && y >= 0;
     }
 
     public boolean getIsObstacle(int x, int y) {
-        if (isOutOfArena(x, y) || cells[x][y].getIsObstacle())
-            return true;
-        return false;
+        return isOutOfArena(x, y) || cells[x][y].getIsObstacle();
     }
 
     public boolean isOutOfArena(int x, int y) {
-        if (x < 0 || y < 0 || x >= MAP_COLS || y >= MAP_ROWS)
-            return true;
-        return false;
+        return x < 0 || y < 0 || x >= MAP_COLS || y >= MAP_ROWS;
     }
 
     public void setIsObstacle(int x, int y, boolean isObstacle) {
@@ -71,6 +57,20 @@ public class Grid extends Observable {
         cells[x][y].setExplored(explored);
         setChanged();
         notifyObservers();
+    }
+
+    public int checkExploredPercentage() {
+        double totalCells = 0.0;
+        double cellsExplored = 0.0;
+        for (int x = 0; x < MAP_COLS; x++) {
+            for (int y = 0; y < MAP_ROWS; y++) {
+                if (cells[x][y].getExplored()) {
+                    cellsExplored += 1;
+                }
+                totalCells += 1;
+            }
+        }
+        return (int) Math.round((cellsExplored / totalCells) * 100);
     }
 
     public void loadFromDisk(String path) {
