@@ -31,6 +31,14 @@ public class Robot extends Observable {
         return mPosY;
     }
 
+    public int getCenterPosX() {
+        return mPosX + 1;
+    }
+
+    public int getCenterPosY() {
+        return mPosY + 1;
+    }
+
     public int getHeading() {
         return mHeading;
     }
