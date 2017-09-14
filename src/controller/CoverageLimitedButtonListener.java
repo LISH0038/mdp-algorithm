@@ -1,9 +1,12 @@
 package controller;
 
+import model.algorithm.AlgorithmRunner;
+import model.algorithm.CoverageExplorationAlgorithmRunner;
 import model.entity.Grid;
 import model.entity.Robot;
 import view.Simulator;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -26,5 +29,16 @@ public class CoverageLimitedButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("Coverage limited button pressed");
+        new CoverageWorker().execute();
+    }
+
+    class CoverageWorker extends SwingWorker<Integer, Integer> {
+
+        @Override
+        protected Integer doInBackground() throws Exception {
+            AlgorithmRunner algorithmRunner = new CoverageExplorationAlgorithmRunner();
+            algorithmRunner.run(mGrid, mRobot, mView.getIsRealRun());
+            return 1;
+        }
     }
 }
