@@ -19,6 +19,8 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
 
     @Override
     public void run(Grid grid, Robot robot, boolean realRun) {
+        grid.reset();
+        robot.reset();
         int coveragePercentage = 0;
         do{
             try{

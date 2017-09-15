@@ -18,6 +18,8 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
 
     @Override
     public void run(Grid grid, Robot robot, boolean realRun) {
+        grid.reset();
+        robot.reset();
         int minutes = -1;
         int seconds = -1;
         do{
@@ -47,6 +49,7 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
         }while(seconds < 0);
 
         int totalTime = (minutes*60) + seconds;
+        System.out.println("Total time: " + totalTime + " seconds");
         timeLimitedAlgorithm(grid, robot, totalTime);
     }
 
@@ -54,7 +57,7 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
         LinkedList<Cell> pathTaken = new LinkedList<Cell>();
         System.out.println("Time-Limit = "+totalTime+" Seconds.");
         int millisecondsTotal = totalTime * 1000;
-        while (millisecondsTotal > 0) {
+        while (millisecondsTotal > 0 && grid.checkExploredPercentage() < 100) {
             Cell position = new Cell(robot.getPosX(), robot.getPosY());
             pathTaken.push(position);
             robot.sense();
