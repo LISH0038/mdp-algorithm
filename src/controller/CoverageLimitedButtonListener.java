@@ -29,6 +29,7 @@ public class CoverageLimitedButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("Coverage limited button pressed");
+        mView.disableButtons();
         new CoverageWorker().execute();
     }
 
@@ -39,6 +40,12 @@ public class CoverageLimitedButtonListener implements ActionListener {
             AlgorithmRunner algorithmRunner = new CoverageExplorationAlgorithmRunner();
             algorithmRunner.run(mGrid, mRobot, mView.getIsRealRun());
             return 1;
+        }
+
+        @Override
+        protected void done() {
+            super.done();
+            mView.enableButtons();
         }
     }
 }

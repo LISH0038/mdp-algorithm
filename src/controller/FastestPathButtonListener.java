@@ -29,6 +29,10 @@ public class FastestPathButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("Fastest path button pressed");
+        if (mView.getRobotSpeed() == 0) {
+            JOptionPane.showMessageDialog(null, "Please set robot speed!");
+        }
+        mView.disableButtons();
         new FastestPathWorker().execute();
     }
 
@@ -36,9 +40,15 @@ public class FastestPathButtonListener implements ActionListener {
 
         @Override
         protected Integer doInBackground() throws Exception {
-            AlgorithmRunner algorithmRunner = new FastestPathAlgorithmRunner();
+            AlgorithmRunner algorithmRunner = new FastestPathAlgorithmRunner(mView.getRobotSpeed());
             algorithmRunner.run(mGrid, mRobot, mView.getIsRealRun());
             return 1;
+        }
+
+        @Override
+        protected void done() {
+            super.done();
+            mView.enableButtons();
         }
     }
 }

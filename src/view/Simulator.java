@@ -1,11 +1,13 @@
 package view;
 
+import com.sun.deploy.util.StringUtils;
 import model.entity.Grid;
 import model.entity.Robot;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 import java.util.Observer;
 
 /**
@@ -22,6 +24,7 @@ public class Simulator extends JFrame {
     private JButton mTimeLimitedButton;
     private JButton mCoverageLimitedButton;
     private JCheckBox mRealRunCheckBox;
+    private JFormattedTextField mRobotSpeedField;
 
     // model
     private Grid mSimulationGrid;
@@ -42,6 +45,9 @@ public class Simulator extends JFrame {
         mTimeLimitedButton = new JButton("Time limited");
         mCoverageLimitedButton = new JButton("Coverage limited");
         mRealRunCheckBox = new JCheckBox("Real run");
+        mRealRunCheckBox.setHorizontalTextPosition(SwingConstants.LEFT);
+        mRobotSpeedField = new JFormattedTextField(NumberFormat.getIntegerInstance());
+        mRobotSpeedField.setPreferredSize(new Dimension(50, mRobotSpeedField.getHeight()));
 
         // set up as observer
         mSimulationRobot.addObserver((Observer) mMapPanel);
@@ -55,6 +61,8 @@ public class Simulator extends JFrame {
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
         bottomPanel.add(mRealRunCheckBox);
+        bottomPanel.add(new JLabel("Speed"));
+        bottomPanel.add(mRobotSpeedField);
         bottomPanel.add(mExplorationButton);
         bottomPanel.add(mFastestPathButton);
         bottomPanel.add(mTimeLimitedButton);
@@ -90,7 +98,27 @@ public class Simulator extends JFrame {
         mCoverageLimitedButton.addActionListener(actionListener);
     }
 
+    public void disableButtons() {
+        mExplorationButton.setEnabled(false);
+        mFastestPathButton.setEnabled(false);
+        mLoadMapButton.setEnabled(false);
+        mTimeLimitedButton.setEnabled(false);
+        mCoverageLimitedButton.setEnabled(false);
+    }
+
+    public void enableButtons() {
+        mExplorationButton.setEnabled(true);
+        mFastestPathButton.setEnabled(true);
+        mLoadMapButton.setEnabled(true);
+        mTimeLimitedButton.setEnabled(true);
+        mCoverageLimitedButton.setEnabled(true);
+    }
+
     public boolean getIsRealRun() {
         return mRealRunCheckBox.isSelected();
+    }
+
+    public int getRobotSpeed() {
+        return mRobotSpeedField.getText().equals("") ? 0 : Integer.parseInt(mRobotSpeedField.getText());
     }
 }

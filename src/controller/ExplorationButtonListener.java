@@ -29,6 +29,7 @@ public class ExplorationButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("Exploration button pressed");
+        mView.disableButtons();
         new ExplorationWorker().execute();
     }
 
@@ -39,6 +40,12 @@ public class ExplorationButtonListener implements ActionListener {
             AlgorithmRunner algorithmRunner = new ExplorationAlgorithmRunner();
             algorithmRunner.run(mGrid, mRobot, mView.getIsRealRun());
             return 1;
+        }
+
+        @Override
+        protected void done() {
+            super.done();
+            mView.enableButtons();
         }
     }
 

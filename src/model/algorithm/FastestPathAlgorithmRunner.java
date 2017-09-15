@@ -18,6 +18,7 @@ import static constant.RobotConstants.*;
  */
 public class FastestPathAlgorithmRunner implements AlgorithmRunner {
 
+    private int sleepDuration;
     private static final int INFINITY = 1000000;
     private static final int START_X = 0;
     private static final int START_Y = 17;
@@ -30,7 +31,9 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
     private int[][] fScore;
     private Cell[][] cells;
 
-    public FastestPathAlgorithmRunner() {
+    public FastestPathAlgorithmRunner(int speed) {
+        sleepDuration = 1000 / speed;
+
         closedSet = new boolean[MAP_COLS - 2][MAP_ROWS - 2];
         openSet = new ArrayList<>();
         cameFrom = new HashMap<>();
@@ -142,7 +145,7 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
 
             if (nextHeading != robot.getHeading()) {
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(sleepDuration);
                 } catch (Exception e) {}
                 if ((robot.getHeading() + 1) % 4 == nextHeading)
                     robot.turn(RIGHT);
@@ -150,7 +153,7 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
                     robot.turn(LEFT);
             }
             try {
-                Thread.sleep(200);
+                Thread.sleep(sleepDuration);
             } catch (Exception e) {}
             robot.move();
         }
@@ -229,46 +232,6 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
 
     private boolean isRobotInGoalZone(int x, int y) {
         if (x == MAP_COLS - 2 && y == 1)
-            return true;
-        return false;
-    }
-
-    private boolean isObstacleOnFrontAndSide(Grid grid, int heading, int x, int y) {
-        boolean obstacleInFront = false, obstacleOnTheLeft = false, obstacleOnTheRight = false;
-
-        for (int i = -1; i <= 1; i++) {
-            if (heading == NORTH) {
-                if (grid.getIsObstacle(x + i, y - 2))
-                    obstacleInFront = true;
-                if (grid.getIsObstacle(x - 2, y + i))
-                    obstacleOnTheLeft = true;
-                if (grid.getIsObstacle(x + 2, y + i))
-                    obstacleOnTheRight = true;
-            } else if (heading == SOUTH) {
-                if (grid.getIsObstacle(x + i, y + 2))
-                    obstacleInFront = true;
-                if (grid.getIsObstacle(x + 2, y + i))
-                    obstacleOnTheLeft = true;
-                if (grid.getIsObstacle(x - 2, y + i))
-                    obstacleOnTheRight = true;
-            } else if (heading == WEST) {
-                if (grid.getIsObstacle(x - 2, y + i))
-                    obstacleInFront = true;
-                if (grid.getIsObstacle(x + i, y + 2))
-                    obstacleOnTheLeft = true;
-                if (grid.getIsObstacle(x + i, y - 2))
-                    obstacleOnTheRight = true;
-            } else if (heading == EAST) {
-                if (grid.getIsObstacle(x + 2, y + i))
-                    obstacleInFront = true;
-                if (grid.getIsObstacle(x + i, y - 2))
-                    obstacleOnTheLeft = true;
-                if (grid.getIsObstacle(x + i, y + 2))
-                    obstacleOnTheRight = true;
-            }
-        }
-
-        if (obstacleInFront && obstacleOnTheLeft && obstacleOnTheRight)
             return true;
         return false;
     }

@@ -27,5 +27,8 @@ public class LoadMapButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("LoadMap button pressed");
+        mView.disableButtons();
+        // TODO: call load map here
+        mView.enableButtons();
     }
 }
