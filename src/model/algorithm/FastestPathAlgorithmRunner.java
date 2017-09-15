@@ -160,30 +160,6 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         boolean left = true, right = true, front = true, back = true;
         List<Cell> neighbors = new ArrayList<>();
 
-        // check left
-        for (int i = -1; i <= 1; ++i) {
-            if (grid.isOutOfArena(current.getX() - 1, current.getY() + i + 1))
-                left = false;
-            if (grid.getIsObstacle(current.getX() - 1, current.getY() + i + 1))
-                left = false;
-        }
-        if (current.getX() <= 0)
-            left = false;
-        if (left)
-            neighbors.add(cells[current.getX() - 1][current.getY()]);
-
-        // check right
-        for (int i = -1; i <= 1; ++i) {
-            if (grid.isOutOfArena(current.getX() + 3, current.getY() + i + 1))
-                right = false;
-            if (grid.getIsObstacle(current.getX() + 3, current.getY() + i + 1))
-                right = false;
-        }
-        if (current.getX() >= MAP_COLS - 3)
-            right = false;
-        if (right)
-            neighbors.add(cells[current.getX() + 1][current.getY()]);
-
         // check front
         for (int i = -1; i <= 1; ++i) {
             if (grid.isOutOfArena(current.getX() + i + 1, current.getY() - 1))
@@ -207,6 +183,30 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
             back = false;
         if (back)
             neighbors.add(cells[current.getX()][current.getY() + 1]);
+
+        // check left
+        for (int i = -1; i <= 1; ++i) {
+            if (grid.isOutOfArena(current.getX() - 1, current.getY() + i + 1))
+                left = false;
+            if (grid.getIsObstacle(current.getX() - 1, current.getY() + i + 1))
+                left = false;
+        }
+        if (current.getX() <= 0)
+            left = false;
+        if (left)
+            neighbors.add(cells[current.getX() - 1][current.getY()]);
+
+        // check right
+        for (int i = -1; i <= 1; ++i) {
+            if (grid.isOutOfArena(current.getX() + 3, current.getY() + i + 1))
+                right = false;
+            if (grid.getIsObstacle(current.getX() + 3, current.getY() + i + 1))
+                right = false;
+        }
+        if (current.getX() >= MAP_COLS - 3)
+            right = false;
+        if (right)
+            neighbors.add(cells[current.getX() + 1][current.getY()]);
 
         if (neighbors.size() == 0)
             System.out.println("No neighbors");

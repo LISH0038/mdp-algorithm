@@ -2,6 +2,7 @@ import controller.*;
 import model.entity.Grid;
 import model.entity.Robot;
 import model.entity.Sensor;
+import model.util.SocketMgr;
 import view.Simulator;
 
 import javax.swing.*;
@@ -16,6 +17,7 @@ import static constant.RobotConstants.*;
 public class AppRunner {
 
     public static void main(String[] args) {
+        SocketMgr.getInstance().openConnection();
         SwingUtilities.invokeLater(() -> {
             // models
             Grid grid = new Grid();

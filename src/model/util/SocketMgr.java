@@ -15,8 +15,8 @@ public class SocketMgr {
     private Socket mSocket;
     private PrintWriter mSocketWriter;
     private BufferedReader mSocketReader;
-    private static final int PORT = 8080;
-    private static final String ADDRESS = "192.168.0.1";
+    private static final int PORT = 5560;
+    private static final String ADDRESS = "192.168.16.1";
 
     private SocketMgr() { }
 
@@ -26,7 +26,7 @@ public class SocketMgr {
         return mInstance;
     }
 
-    public void openConnect() {
+    public void openConnection() {
         try {
             mSocket = new Socket(ADDRESS, PORT);
             mSocketWriter = new PrintWriter(mSocket.getOutputStream(), true);
