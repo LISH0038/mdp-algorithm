@@ -1,9 +1,12 @@
 package controller;
 
+import model.algorithm.AlgorithmRunner;
+import model.algorithm.TimeExplorationAlgorithmRunner;
 import model.entity.Grid;
 import model.entity.Robot;
 import view.Simulator;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -26,6 +29,26 @@ public class TimeLimitedButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("Time limited button pressed");
+        if (mView.getRobotSpeed() == 0) {
+            JOptionPane.showMessageDialog(null, "Please set robot speed! (X Steps per second)", "Fastest path", JOptionPane.ERROR_MESSAGE);
+        }
+        mView.disableButtons();
+        new TimeLimitedWorker().execute();
     }
 
+    class TimeLimitedWorker extends SwingWorker<Integer, Integer> {
+
+        @Override
+        protected Integer doInBackground() throws Exception {
+            AlgorithmRunner algorithmRunner = new TimeExplorationAlgorithmRunner(mView.getRobotSpeed());
+            algorithmRunner.run(mGrid, mRobot, mView.getIsRealRun());
+            return 1;
+        }
+
+        @Override
+        protected void done() {
+            super.done();
+            mView.enableButtons();
+        }
+    }
 }

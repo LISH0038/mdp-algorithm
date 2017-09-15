@@ -1,5 +1,4 @@
 package model.algorithm;
-
 import model.entity.Grid;
 import model.entity.Robot;
 import model.entity.Cell;
@@ -10,35 +9,52 @@ import java.util.*;
 import static constant.RobotConstants.LEFT;
 import static constant.RobotConstants.RIGHT;
 
-public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
+public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
 
     private int sleepDuration;
-    public CoverageExplorationAlgorithmRunner(int speed){
+    public TimeExplorationAlgorithmRunner(int speed){
         sleepDuration = 1000 / speed;
     }
 
     @Override
     public void run(Grid grid, Robot robot, boolean realRun) {
-        int coveragePercentage = 0;
+        int minutes = -1;
+        int seconds = -1;
         do{
             try{
-                String input = JOptionPane.showInputDialog(null, "Please enter the exploration percentage:", "Enter Percentage", JOptionPane.INFORMATION_MESSAGE);
+                String input = JOptionPane.showInputDialog(null, "Please enter the time limit in MINUTES:", "Enter Time Limit (Minutes)", JOptionPane.INFORMATION_MESSAGE);
                 if(input.equals(JOptionPane.CANCEL_OPTION)){
                     break;
                 }else{
-                    coveragePercentage = Integer.parseInt(input);
+                    minutes = Integer.parseInt(input);
                 }
             }catch(NumberFormatException e){
-                JOptionPane.showMessageDialog(null, "Please enter an integer more than 0!", "Error!", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Please enter an integer!", "Error!", JOptionPane.ERROR_MESSAGE);
             }
-        }while(coveragePercentage == 0);
-        coverageLimitedAlgorithm(grid, robot, coveragePercentage);
+        }while(minutes < 0);
+
+        do{
+            try{
+                String input = JOptionPane.showInputDialog(null, "Please enter the time limit in SECONDS:", "Enter Time Limit (Seconds)", JOptionPane.INFORMATION_MESSAGE);
+                if(input.equals(JOptionPane.CANCEL_OPTION)){
+                    break;
+                }else{
+                    seconds = Integer.parseInt(input);
+                }
+            }catch(NumberFormatException e){
+                JOptionPane.showMessageDialog(null, "Please enter an integer!", "Error!", JOptionPane.ERROR_MESSAGE);
+            }
+        }while(seconds < 0);
+
+        int totalTime = (minutes*60) + seconds;
+        timeLimitedAlgorithm(grid, robot, totalTime);
     }
 
-    public void coverageLimitedAlgorithm(Grid grid, Robot robot, int coveragePercentage){
+    public void timeLimitedAlgorithm(Grid grid, Robot robot, int totalTime){
         LinkedList<Cell> pathTaken = new LinkedList<Cell>();
-
-        while (grid.checkExploredPercentage() < coveragePercentage) {
+        System.out.println("Time-Limit = "+totalTime+" Seconds.");
+        int millisecondsTotal = totalTime * 1000;
+        while (millisecondsTotal > 0) {
             Cell position = new Cell(robot.getPosX(), robot.getPosY());
             pathTaken.push(position);
             robot.sense();
@@ -54,24 +70,29 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
                     System.out.println("OBSTACLE DETECTED! (ALL 3 SIDES) U-TURNING");
                     robot.turn(RIGHT);
                     robot.turn(RIGHT);
+                    millisecondsTotal = millisecondsTotal - (sleepDuration * 2);
                 } else if (robot.isObstacleLeft()) {
                     System.out.println("OBSTACLE DETECTED! (FRONT + LEFT) TURNING RIGHT");
                     robot.turn(RIGHT);
+                    millisecondsTotal = millisecondsTotal - sleepDuration;
                 } else {
                     System.out.println("OBSTACLE DETECTED! (FRONT) TURNING LEFT");
                     robot.turn(LEFT);
+                    millisecondsTotal = millisecondsTotal - sleepDuration;
                 }
                 robot.sense();
                 System.out.println("-----------------------------------------------");
             } else if (!robot.isObstacleLeft()) {
                 System.out.println("NO OBSTACLES ON THE LEFT! TURNING LEFT");
                 robot.turn(LEFT);
+                millisecondsTotal = millisecondsTotal - sleepDuration;
                 robot.sense();
                 System.out.println("-----------------------------------------------");
             }
             robot.move();
+            millisecondsTotal = millisecondsTotal - sleepDuration;
         }
-
+        System.out.println("Time's Up! Moving back to start point.");
 
         while(!pathTaken.isEmpty()){
             try {
@@ -154,5 +175,4 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
             robot.move();
         }
     }
-
 }

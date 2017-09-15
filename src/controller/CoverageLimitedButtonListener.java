@@ -29,6 +29,9 @@ public class CoverageLimitedButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("Coverage limited button pressed");
+        if (mView.getRobotSpeed() == 0) {
+            JOptionPane.showMessageDialog(null, "Please set robot speed (X Steps per second)!", "Fastest path", JOptionPane.ERROR_MESSAGE);
+        }
         mView.disableButtons();
         new CoverageWorker().execute();
     }
@@ -37,7 +40,7 @@ public class CoverageLimitedButtonListener implements ActionListener {
 
         @Override
         protected Integer doInBackground() throws Exception {
-            AlgorithmRunner algorithmRunner = new CoverageExplorationAlgorithmRunner();
+            AlgorithmRunner algorithmRunner = new CoverageExplorationAlgorithmRunner(mView.getRobotSpeed());
             algorithmRunner.run(mGrid, mRobot, mView.getIsRealRun());
             return 1;
         }

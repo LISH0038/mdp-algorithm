@@ -30,7 +30,7 @@ public class FastestPathButtonListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         System.out.println("Fastest path button pressed");
         if (mView.getRobotSpeed() == 0) {
-            JOptionPane.showMessageDialog(null, "Please set robot speed!", "Fastest path", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Please set robot speed! (X Steps per second)", "Fastest path", JOptionPane.ERROR_MESSAGE);
         }
         mView.disableButtons();
         new FastestPathWorker().execute();
