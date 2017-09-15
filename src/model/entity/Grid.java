@@ -1,5 +1,8 @@
 package model.entity;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Observable;
 
 import static constant.MapConstants.*;
@@ -73,8 +76,22 @@ public class Grid extends Observable {
         return (int) Math.round((cellsExplored / totalCells) * 100);
     }
 
-    public void loadFromDisk(String path) {
+    public void loadFromDisk(String path) throws IOException {
+        this.reset();
 
+        BufferedReader reader = new BufferedReader(new FileReader(path));
+
+        for (int i = 0; i < MAP_ROWS; i++) {
+            String line = reader.readLine();
+            String[] numberStrings = line.trim().split("\\s+");
+            for (int j = 0; j < MAP_COLS; j++) {
+                if (numberStrings[j].equals("1")) {
+                    this.setIsObstacle(j, i, true);
+                } else {
+                    this.setIsObstacle(j, i, false);
+                }
+            }
+        }
     }
 
     /**
