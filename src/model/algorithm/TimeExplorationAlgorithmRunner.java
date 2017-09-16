@@ -51,6 +51,7 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
         int totalTime = (minutes*60) + seconds;
         System.out.println("Total time: " + totalTime + " seconds");
         timeLimitedAlgorithm(grid, robot, totalTime);
+        grid.generateDescriptor();
     }
 
     public void timeLimitedAlgorithm(Grid grid, Robot robot, int totalTime){

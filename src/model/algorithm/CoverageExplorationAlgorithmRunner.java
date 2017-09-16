@@ -35,6 +35,7 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
             }
         }while(coveragePercentage == 0);
         coverageLimitedAlgorithm(grid, robot, coveragePercentage);
+        grid.generateDescriptor();
     }
 
     public void coverageLimitedAlgorithm(Grid grid, Robot robot, int coveragePercentage){

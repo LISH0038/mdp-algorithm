@@ -62,6 +62,10 @@ public class Grid extends Observable {
         notifyObservers();
     }
 
+    public boolean getIsExplored(int x, int y) {
+        return !isOutOfArena(x, y) && cells[x][y].getExplored();
+    }
+
     public int checkExploredPercentage() {
         double totalCells = 0.0;
         double cellsExplored = 0.0;
@@ -92,6 +96,55 @@ public class Grid extends Observable {
                 }
             }
         }
+    }
+
+    public void generateDescriptor() {
+        StringBuilder builder;
+
+        // first build string for exploration status
+        builder = new StringBuilder();
+        builder.append(11);
+        for (int y = MAP_ROWS - 1; y >= 0; y--) {
+            for (int x = 0; x < MAP_COLS; x++) {
+                if (getIsExplored(x, y)) {
+                    builder.append(1);
+                } else {
+                    builder.append(0);
+                }
+            }
+        }
+        builder.append(11);
+        String part1 = builder.toString();
+        builder = new StringBuilder();
+        for (int i = 0; i < part1.length() / 4; i++) {
+            builder.append(Integer.toHexString(Integer.parseInt(part1.substring(i * 4, (i + 1) * 4), 2)));
+        }
+        System.out.println("Map descriptor part 1:");
+        System.out.println(builder.toString());
+
+        // second build string for obstacle status
+        builder = new StringBuilder();
+        for (int y = MAP_ROWS - 1; y >= 0; y--) {
+            for (int x = 0; x < MAP_COLS; x++) {
+                if (getIsExplored(x, y)) {
+                    if (getIsObstacle(x, y)) {
+                        builder.append(1);
+                    } else {
+                        builder.append(0);
+                    }
+                }
+            }
+        }
+        while (0 != (builder.length() % 8)) {
+            builder.append(0);
+        }
+        String part2 = builder.toString();
+        builder = new StringBuilder();
+        for (int i = 0; i < part2.length() / 4; i++) {
+            builder.append(Integer.toHexString(Integer.parseInt(part2.substring(i * 4, (i + 1) * 4), 2)));
+        }
+        System.out.println("Map descriptor part 2:");
+        System.out.println(builder.toString());
     }
 
     /**

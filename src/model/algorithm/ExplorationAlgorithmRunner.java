@@ -21,6 +21,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         grid.reset();
         robot.reset();
         runExplorationAlgorithmThorough(grid, robot);
+        grid.generateDescriptor();
     }
 
     public void runExplorationAlgorithmThorough(Grid grid, Robot robot) {
