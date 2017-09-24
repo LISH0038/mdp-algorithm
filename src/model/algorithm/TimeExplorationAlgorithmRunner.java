@@ -58,30 +58,29 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
         LinkedList<Cell> pathTaken = new LinkedList<Cell>();
         System.out.println("Time-Limit = "+totalTime+" Seconds.");
         int millisecondsTotal = totalTime * 1000;
-        while (millisecondsTotal > 0 && grid.checkExploredPercentage() < 100) {
+        boolean endZoneFlag = false;
+        boolean startZoneFlag = false;
+        while (millisecondsTotal > 0 && (!endZoneFlag || !startZoneFlag)) {
             Cell position = new Cell(robot.getPosX(), robot.getPosY());
             pathTaken.push(position);
             robot.sense();
-            /*
-            MAKE IT MOVE SLOWLY SO CAN SEE STEP BY STEP MOVEMENT
-             */
-            try {
-                Thread.sleep(sleepDuration);
-            } catch (Exception e) {
-            }
             if (robot.isObstacleAhead()) {
                 if (robot.isObstacleRight() && robot.isObstacleLeft()) {
                     System.out.println("OBSTACLE DETECTED! (ALL 3 SIDES) U-TURNING");
                     robot.turn(RIGHT);
+                    stepTaken();
                     robot.turn(RIGHT);
+                    stepTaken();
                     millisecondsTotal = millisecondsTotal - (sleepDuration * 2);
                 } else if (robot.isObstacleLeft()) {
                     System.out.println("OBSTACLE DETECTED! (FRONT + LEFT) TURNING RIGHT");
                     robot.turn(RIGHT);
+                    stepTaken();
                     millisecondsTotal = millisecondsTotal - sleepDuration;
                 } else {
                     System.out.println("OBSTACLE DETECTED! (FRONT) TURNING LEFT");
                     robot.turn(LEFT);
+                    stepTaken();
                     millisecondsTotal = millisecondsTotal - sleepDuration;
                 }
                 robot.sense();
@@ -89,94 +88,127 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
             } else if (!robot.isObstacleLeft()) {
                 System.out.println("NO OBSTACLES ON THE LEFT! TURNING LEFT");
                 robot.turn(LEFT);
+                stepTaken();
                 millisecondsTotal = millisecondsTotal - sleepDuration;
                 robot.sense();
                 System.out.println("-----------------------------------------------");
             }
             robot.move();
+            stepTaken();
             millisecondsTotal = millisecondsTotal - sleepDuration;
+            System.out.println(millisecondsTotal);
+            if(Grid.isInEndZone(robot.getPosX(), robot.getPosY())){
+                endZoneFlag = true;
+            }
+            if(endZoneFlag && Grid.isInStartZone(robot.getPosX()+2, robot.getPosY())){
+                startZoneFlag = true;
+            }
         }
         System.out.println("Time's Up! Moving back to start point.");
+        if(!startZoneFlag){
+            while(!pathTaken.isEmpty()){
+                Cell location = pathTaken.pop();
 
-        while(!pathTaken.isEmpty()){
-            try {
-                Thread.sleep(sleepDuration);
-            } catch (Exception e) {
-            }
-            Cell location = pathTaken.pop();
+                if(location.getX() > robot.getPosX()){
+                    switch(robot.getHeading()){
+                        case 0: // NORTH
+                            robot.turn(RIGHT);
+                            stepTaken();
+                            break;
+                        case 1: // EAST
+                            break;
+                        case 2: // SOUTH
+                            robot.turn(LEFT);
+                            stepTaken();
+                            break;
+                        case 3: // WEST
+                            robot.turn(RIGHT);
+                            stepTaken();
+                            robot.turn(RIGHT);
+                            stepTaken();
+                            break;
+                        default:
+                            break;
+                    }
+                }else if(location.getX() < robot.getPosX()){
+                    switch(robot.getHeading()){
+                        case 0: // NORTH
+                            robot.turn(LEFT);
+                            stepTaken();
+                            break;
+                        case 1: // EAST
+                            robot.turn(RIGHT);
+                            stepTaken();
+                            robot.turn(RIGHT);
+                            stepTaken();
+                            break;
+                        case 2: // SOUTH
+                            robot.turn(RIGHT);
+                            stepTaken();
+                            break;
+                        case 3: // WEST
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
-            if(location.getX() > robot.getPosX()){
-                switch(robot.getHeading()){
-                    case 0: // NORTH
-                        robot.turn(RIGHT);
-                        break;
-                    case 1: // EAST
-                        break;
-                    case 2: // SOUTH
-                        robot.turn(LEFT);
-                        break;
-                    case 3: // WEST
-                        robot.turn(RIGHT);
-                        robot.turn(RIGHT);
-                        break;
-                    default:
-                        break;
+                if(location.getY() > robot.getPosY()){
+                    switch(robot.getHeading()){
+                        case 0: // NORTH
+                            robot.turn(RIGHT);
+                            stepTaken();
+                            robot.turn(RIGHT);
+                            stepTaken();
+                            break;
+                        case 1: // EAST
+                            robot.turn(RIGHT);
+                            stepTaken();
+                            break;
+                        case 2: // SOUTH
+                            break;
+                        case 3: // WEST
+                            robot.turn(LEFT);
+                            stepTaken();
+                            break;
+                        default:
+                            break;
+                    }
+                }else if(location.getY() < robot.getPosY()){
+                    switch(robot.getHeading()){
+                        case 0: // NORTH
+                            break;
+                        case 1: // EAST
+                            robot.turn(LEFT);
+                            stepTaken();
+                            break;
+                        case 2: // SOUTH
+                            robot.turn(LEFT);
+                            stepTaken();
+                            robot.turn(LEFT);
+                            stepTaken();
+                            break;
+                        case 3: // WEST
+                            robot.turn(RIGHT);
+                            stepTaken();
+                            break;
+                        default:
+                            break;
+                    }
                 }
-            }else if(location.getX() < robot.getPosX()){
-                switch(robot.getHeading()){
-                    case 0: // NORTH
-                        robot.turn(LEFT);
-                        break;
-                    case 1: // EAST
-                        robot.turn(RIGHT);
-                        robot.turn(RIGHT);
-                        break;
-                    case 2: // SOUTH
-                        robot.turn(RIGHT);
-                        break;
-                    case 3: // WEST
-                        break;
-                    default:
-                        break;
-                }
+                robot.move();
+                stepTaken();
             }
+        }
+    }
 
-            if(location.getY() > robot.getPosY()){
-                switch(robot.getHeading()){
-                    case 0: // NORTH
-                        robot.turn(RIGHT);
-                        robot.turn(RIGHT);
-                        break;
-                    case 1: // EAST
-                        robot.turn(RIGHT);
-                        break;
-                    case 2: // SOUTH
-                        break;
-                    case 3: // WEST
-                        robot.turn(LEFT);
-                        break;
-                    default:
-                        break;
-                }
-            }else if(location.getY() < robot.getPosY()){
-                switch(robot.getHeading()){
-                    case 0: // NORTH
-                        break;
-                    case 1: // EAST
-                        robot.turn(LEFT);
-                        break;
-                    case 2: // SOUTH
-                        robot.turn(LEFT);
-                        robot.turn(LEFT);
-                        break;
-                    case 3: // WEST
-                        robot.turn(RIGHT);
-                        break;
-                    default:
-                        break;
-                }
-            }
-            robot.move();
+    public void stepTaken(){
+        /*
+            MAKE IT MOVE SLOWLY SO CAN SEE STEP BY STEP MOVEMENT
+             */
+        try {
+            Thread.sleep(sleepDuration);
+        } catch (Exception e) {
         }
     }
 }
