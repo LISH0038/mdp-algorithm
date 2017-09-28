@@ -40,6 +40,7 @@ public class FastestPathButtonListener implements ActionListener {
 
         @Override
         protected Integer doInBackground() throws Exception {
+            System.out.println("Worker started");
             AlgorithmRunner algorithmRunner = new FastestPathAlgorithmRunner(mView.getRobotSpeed());
             algorithmRunner.run(mGrid, mRobot, mView.getIsRealRun());
             return 1;
@@ -48,6 +49,7 @@ public class FastestPathButtonListener implements ActionListener {
         @Override
         protected void done() {
             super.done();
+            System.out.println("Worker finished");
             mView.enableButtons();
         }
     }

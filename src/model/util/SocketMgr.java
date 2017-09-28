@@ -31,7 +31,9 @@ public class SocketMgr {
             mSocket = new Socket(ADDRESS, PORT);
             mSocketWriter = new PrintWriter(mSocket.getOutputStream(), true);
             mSocketReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
+            System.out.println("Socket connection successful");
         } catch (IOException e) {
+            e.printStackTrace();
             System.out.println("Socket connection failed");
         }
     }
@@ -44,6 +46,7 @@ public class SocketMgr {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("Socket connection closed");
     }
 
     public boolean isConnected() {
@@ -51,11 +54,15 @@ public class SocketMgr {
     }
 
     public void sendMessage(String dest, String msg) {
+        if (!isConnected())
+            openConnection();
         mSocketWriter.println(dest + msg);
         System.out.println("Sent message: " + dest + msg);
     }
 
     public String receiveMessage() {
+        if (!isConnected())
+            openConnection();
         try {
             String msg = mSocketReader.readLine();
             System.out.println("Received message: " + msg);

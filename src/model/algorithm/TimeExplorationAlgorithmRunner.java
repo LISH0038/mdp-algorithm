@@ -2,6 +2,7 @@ package model.algorithm;
 import model.entity.Grid;
 import model.entity.Robot;
 import model.entity.Cell;
+import model.util.SocketMgr;
 
 import javax.swing.*;
 import java.util.*;
@@ -20,6 +21,12 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
     public void run(Grid grid, Robot robot, boolean realRun) {
         grid.reset();
         robot.reset();
+        if (realRun) {
+            String msg = SocketMgr.getInstance().receiveMessage();
+            while (!msg.equals("exs")) {
+                msg = SocketMgr.getInstance().receiveMessage();
+            }
+        }
         int minutes = -1;
         int seconds = -1;
         do{

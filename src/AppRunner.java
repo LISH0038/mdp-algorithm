@@ -17,7 +17,6 @@ import static constant.RobotConstants.*;
 public class AppRunner {
 
     public static void main(String[] args) {
-//        SocketMgr.getInstance().openConnection();
         SwingUtilities.invokeLater(() -> {
             // models
             Grid grid = new Grid();
@@ -39,12 +38,12 @@ public class AppRunner {
             Simulator simulator = new Simulator(grid, robot);
 
             // controller
-            // TODO: add them to the view
             new CoverageLimitedButtonListener(simulator, grid, robot);
             new ExplorationButtonListener(simulator, grid, robot);
             new FastestPathButtonListener(simulator, grid, robot);
             new LoadMapButtonListener(simulator, grid, robot);
             new TimeLimitedButtonListener(simulator, grid, robot);
+            new RealRunCheckBoxListener(simulator);
 
             simulator.setVisible(true);
             System.out.println("Simulator started.");

@@ -23,20 +23,24 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
     public void run(Grid grid, Robot robot, boolean realRun) {
         grid.reset();
         robot.reset();
-        //String msg = SocketMgr.getInstance().receiveMessage();
-        //while (!msg.equals("exs")) {
-        //    msg = SocketMgr.getInstance().receiveMessage();
-        //}
-        runExplorationAlgorithmThorough(grid, robot);
+        if (realRun) {
+            String msg = SocketMgr.getInstance().receiveMessage();
+            while (!msg.equals("exs")) {
+                msg = SocketMgr.getInstance().receiveMessage();
+            }
+        }
+        runExplorationAlgorithmThorough(grid, robot, realRun);
         grid.generateDescriptor();
     }
 
-    public void runExplorationAlgorithmThorough(Grid grid, Robot robot) {
+    public void runExplorationAlgorithmThorough(Grid grid, Robot robot, boolean realRun) {
         // MOVE OVER TO TOP LEFT CORNER OF ARENA.
         boolean endZoneFlag = false;
         boolean startZoneFlag = false;
         while (!endZoneFlag || !startZoneFlag) {
             robot.sense();
+            if (realRun)
+                SocketMgr.getInstance().sendMessage(TARGET_ANDROID, MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid()));
             if (robot.isObstacleAhead()) {
                 if (robot.isObstacleRight() && robot.isObstacleLeft()) {
                     System.out.println("OBSTACLE DETECTED! (ALL 3 SIDES) U-TURNING");
@@ -54,14 +58,16 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                     stepTaken();
                 }
                 robot.sense();
-                //SocketMgr.getInstance().sendMessage(TARGET_ANDROID, MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid()));
+                if (realRun)
+                    SocketMgr.getInstance().sendMessage(TARGET_ANDROID, MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid()));
                 System.out.println("-----------------------------------------------");
             } else if (!robot.isObstacleLeft()) {
                 System.out.println("NO OBSTACLES ON THE LEFT! TURNING LEFT");
                 robot.turn(LEFT);
                 stepTaken();
                 robot.sense();
-                //SocketMgr.getInstance().sendMessage(TARGET_ANDROID, MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid()));
+                if (realRun)
+                    SocketMgr.getInstance().sendMessage(TARGET_ANDROID, MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid()));
                 System.out.println("-----------------------------------------------");
             }
             robot.move();

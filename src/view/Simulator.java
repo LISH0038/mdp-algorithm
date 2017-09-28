@@ -98,6 +98,10 @@ public class Simulator extends JFrame {
         mCoverageLimitedButton.addActionListener(actionListener);
     }
 
+    public void addRealRunCheckBoxListener(ActionListener actionListener) {
+        mRealRunCheckBox.addActionListener(actionListener);
+    }
+
     public void disableButtons() {
         mExplorationButton.setEnabled(false);
         mFastestPathButton.setEnabled(false);
@@ -112,6 +116,14 @@ public class Simulator extends JFrame {
         mLoadMapButton.setEnabled(true);
         mTimeLimitedButton.setEnabled(true);
         mCoverageLimitedButton.setEnabled(true);
+    }
+
+    public void disableLoadMapButton() {
+        mLoadMapButton.setEnabled(false);
+    }
+
+    public void enableLoadMapButton() {
+        mLoadMapButton.setEnabled(true);
     }
 
     public boolean getIsRealRun() {

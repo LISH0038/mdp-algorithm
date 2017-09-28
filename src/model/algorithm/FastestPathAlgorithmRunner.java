@@ -3,6 +3,8 @@ package model.algorithm;
 import model.entity.Cell;
 import model.entity.Grid;
 import model.entity.Robot;
+import model.entity.Sensor;
+import model.util.SocketMgr;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,16 +26,109 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
     private static final int START_Y = 17;
     private static final int GOAL_X = 12;
     private static final int GOAL_Y = 0;
-    private boolean[][] closedSet;
-    private List<Cell> openSet;
-    private HashMap<Cell, Cell> cameFrom;
-    private int[][] gScore;
-    private int[][] fScore;
-    private Cell[][] cells;
 
     public FastestPathAlgorithmRunner(int speed) {
         sleepDuration = 1000 / speed;
+    }
 
+    @Override
+    public void run(Grid grid, Robot robot, boolean realRun) {
+        robot.reset();
+
+        // receive waypoint
+        int wayPointX, wayPointY;
+        if (realRun) {
+            // receive from Android
+            System.out.println("Waiting for waypoint");
+            String msg = SocketMgr.getInstance().receiveMessage();
+            List<Integer> waypoints;
+            while ((waypoints = parseMessage(msg)) == null) {
+                msg = SocketMgr.getInstance().receiveMessage();
+            }
+            wayPointX = waypoints.get(0)-1;
+            wayPointY = waypoints.get(1)-1;
+        } else {
+            // ignore waypoint for simulation
+            wayPointX = START_X;
+            wayPointY = START_Y;
+        }
+
+        // run from start to waypoint and from waypoint to goal
+        System.out.println("Fastest path algorithm started with waypoint " + wayPointX + "," + wayPointY);
+        Robot fakeRobot = new Robot(null, new ArrayList<>());
+        List<String> path1 = runAstar(START_X, START_Y, wayPointX, wayPointY, grid, fakeRobot);
+        List<String> path2 = runAstar(wayPointX, wayPointY, GOAL_X, GOAL_Y, grid, fakeRobot);
+
+        if (path1 != null && path2 != null) {
+            System.out.println("Algorithm finished, executing actions");
+            path1.addAll(path2);
+            System.out.println(path1.toString());
+            if (realRun) {
+                // TODO: send actions to Arduino instead of running in simulator
+                takeStep();
+                for (String action : path1) {
+                    if (action.equals("M")) {
+                        robot.move();
+                    } else if (action.equals("L")) {
+                        robot.turn(LEFT);
+                    } else if (action.equals("R")) {
+                        robot.turn(RIGHT);
+                    }
+                    takeStep();
+                }
+            } else {
+                takeStep();
+                for (String action : path1) {
+                    if (action.equals("M")) {
+                        robot.move();
+                    } else if (action.equals("L")) {
+                        robot.turn(LEFT);
+                    } else if (action.equals("R")) {
+                        robot.turn(RIGHT);
+                    }
+                    takeStep();
+                }
+            }
+        } else {
+            System.out.println("Fastest path not found!");
+        }
+    }
+
+    private List<Integer> parseMessage(String msg) {
+        String[] splitString = msg.split(",", 2);
+        List<Integer> waypoints = new ArrayList<>();
+
+        Integer wayPointX = null, wayPointY = null;
+        try {
+            wayPointX = Integer.parseInt(splitString[0]);
+            wayPointY = Integer.parseInt(splitString[1]);
+            waypoints.add(wayPointX);
+            waypoints.add(wayPointY);
+            return waypoints;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Run the A* algorithm from point (startX, startY) to (endX, endY)
+     * @param startX
+     * @param startY
+     * @param endX
+     * @param endY
+     * @param grid
+     * @param robot
+     * @return A list of actions for the robot to take to reach the goal
+     */
+    private List<String> runAstar(int startX, int startY, int endX, int endY, Grid grid, Robot robot) {
+        // initialization
+        boolean[][] closedSet;
+        List<Cell> openSet;
+        HashMap<Cell, Cell> cameFrom;
+        int[][] gScore;
+        int[][] fScore;
+        Cell[][] cells;
         closedSet = new boolean[MAP_COLS - 2][MAP_ROWS - 2];
         openSet = new ArrayList<>();
         cameFrom = new HashMap<>();
@@ -48,64 +143,44 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
                 closedSet[x][y] = false;
                 cells[x][y] = new Cell(x, y);
             }
-        gScore[START_X][START_Y] = 0;
-        fScore[START_X][START_Y] = estimateDistanceToGoal(START_X, START_Y, GOAL_X, GOAL_Y);
-        cells[START_X][START_Y].setDistance(fScore[START_X][START_Y]);
-        openSet.add(cells[START_X][START_Y]);
-    }
+        gScore[startX][startY] = 0;
+        fScore[startX][startY] = estimateDistanceToGoal(startX, startY, endX, endY);
+        cells[startX][startY].setDistance(fScore[startX][startY]);
+        openSet.add(cells[startX][startY]);
 
-    @Override
-    public void run(Grid grid, Robot robot, boolean realRun) {
-        System.out.println("Fastest path algorithm started");
-
-        robot.reset();
-        System.out.println("Reset!");
-        try {
-            while (!openSet.isEmpty()) {
-                Cell current = getCurrent();
-                System.out.println("Current: " + current.getX() + ", " + current.getY());
-                if (current.getX() == GOAL_X && current.getY() == GOAL_Y) {
-                    System.out.println("Reached goal");
-                    reconstructPath(grid, robot, current);
-                    return;
-                }
-
-                openSet.remove(current);
-                closedSet[current.getX()][current.getY()] = true;
-
-                for (Cell neighbor : generateNeighbor(grid, current)) {
-                    System.out.println("Begin updating");
-                    if (closedSet[neighbor.getX()][neighbor.getY()])
-                        continue;
-
-                    if (!openSet.contains(neighbor))
-                        openSet.add(neighbor);
-
-                    int tentativeGScore = gScore[current.getX()][current.getY()] + 1; // TODO: should this always be 1?
-                    if (tentativeGScore >= gScore[neighbor.getX()][neighbor.getY()])
-                        continue;
-
-                    cameFrom.put(neighbor, current);
-                    gScore[neighbor.getX()][neighbor.getY()] = tentativeGScore;
-                    fScore[neighbor.getX()][neighbor.getY()] = tentativeGScore + estimateDistanceToGoal(neighbor.getX(), neighbor.getY(), GOAL_X, GOAL_Y);
-                    System.out.println("Finish updating");
-                }
+        // run algorithm
+        while (!openSet.isEmpty()) {
+            Cell current = getCurrent(openSet, fScore);
+            //System.out.println("Current: " + current.getX() + ", " + current.getY());
+            if (current.getX() == endX && current.getY() == endY) {
+                System.out.println("Reached goal");
+                return reconstructPath(grid, robot, current, cameFrom);
             }
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
-    }
 
-    private void printMap() {
-        for (int y = 0; y < MAP_ROWS - 2; y++) {
-            for (int x = 0; x < MAP_COLS - 2; x++) {
-                System.out.print(fScore[x][y] + " ");
+            openSet.remove(current);
+            closedSet[current.getX()][current.getY()] = true;
+
+            for (Cell neighbor : generateNeighbor(grid, current, cells)) {
+                if (closedSet[neighbor.getX()][neighbor.getY()])
+                    continue;
+
+                if (!openSet.contains(neighbor))
+                    openSet.add(neighbor);
+
+                int tentativeGScore = gScore[current.getX()][current.getY()] + 1; // TODO: should this always be 1?
+                if (tentativeGScore >= gScore[neighbor.getX()][neighbor.getY()])
+                    continue;
+
+                cameFrom.put(neighbor, current);
+                gScore[neighbor.getX()][neighbor.getY()] = tentativeGScore;
+                fScore[neighbor.getX()][neighbor.getY()] = tentativeGScore + estimateDistanceToGoal(neighbor.getX(), neighbor.getY(), GOAL_X, GOAL_Y);
             }
-            System.out.println();
         }
+
+        return null;
     }
 
-    private Cell getCurrent() {
+    private Cell getCurrent(List<Cell> openSet, int[][] fScore) {
         Cell minCell = null;
         int minF = INFINITY;
         for (Cell cell : openSet) {
@@ -118,7 +193,7 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         return minCell;
     }
 
-    private void reconstructPath(Grid grid, Robot robot, Cell current) {
+    private List<String> reconstructPath(Grid grid, Robot robot, Cell current, HashMap<Cell, Cell> cameFrom) {
         // construct the path first
         List<Cell> path = new LinkedList<>();
         path.add(current);
@@ -129,8 +204,7 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         path.remove(0); // remove the starting point
 
         // convert path to robot movement
-        // TODO: encode the actions as a string for sending to actual robot
-        //List<String> actions = new ArrayList<>();
+        List<String> actions = new ArrayList<>();
         for (Cell cell : path) {
             // see if we need to turn
             int nextHeading = 0;
@@ -144,76 +218,66 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
                 nextHeading = NORTH;
 
             if (nextHeading != robot.getHeading()) {
-                try {
-                    Thread.sleep(sleepDuration);
-                } catch (Exception e) {}
-                if ((robot.getHeading() + 1) % 4 == nextHeading)
+                if ((robot.getHeading() + 1) % 4 == nextHeading) {
+                    actions.add("R");
                     robot.turn(RIGHT);
-                else
+                } else if ((robot.getHeading() + 3) % 4 == nextHeading){
+                    actions.add("L");
                     robot.turn(LEFT);
+                } else {
+                    actions.add("L");
+                    robot.turn(LEFT);
+                    actions.add("L");
+                    robot.turn(LEFT);
+                }
             }
-            try {
-                Thread.sleep(sleepDuration);
-            } catch (Exception e) {}
+            actions.add("M");
             robot.move();
         }
+
+        return actions;
     }
 
-    private List<Cell> generateNeighbor(Grid grid, Cell current) {
+    private List<Cell> generateNeighbor(Grid grid, Cell current, Cell[][] cells) {
         boolean left = true, right = true, front = true, back = true;
         List<Cell> neighbors = new ArrayList<>();
 
+        int trueX = current.getX() + 1, trueY = current.getY() + 1;
         // check front
         for (int i = -1; i <= 1; ++i) {
-            if (grid.isOutOfArena(current.getX() + i + 1, current.getY() - 1))
-                front = false;
-            if (grid.getIsObstacle(current.getX() + i + 1, current.getY() - 1))
+            if (grid.isOutOfArena(trueX + i, trueY - 2) ||
+                    grid.getIsObstacle(trueX + i, trueY - 2))
                 front = false;
         }
-        if (current.getY() <= 0)
-            front = false;
         if (front)
             neighbors.add(cells[current.getX()][current.getY() - 1]);
 
         // check back
         for (int i = -1; i <= 1; ++i) {
-            if (grid.isOutOfArena(current.getX() + i + 1, current.getY() + 3))
-                back = false;
-            if (grid.getIsObstacle(current.getX() + i + 1, current.getY() + 3))
+            if (grid.isOutOfArena(trueX + i, trueY + 2) ||
+                    grid.getIsObstacle(trueX + i, trueY + 2))
                 back = false;
         }
-        if (current.getY() >= MAP_ROWS - 3)
-            back = false;
         if (back)
             neighbors.add(cells[current.getX()][current.getY() + 1]);
 
         // check left
         for (int i = -1; i <= 1; ++i) {
-            if (grid.isOutOfArena(current.getX() - 1, current.getY() + i + 1))
-                left = false;
-            if (grid.getIsObstacle(current.getX() - 1, current.getY() + i + 1))
+            if (grid.isOutOfArena(trueX - 2, trueY + i) ||
+                    grid.getIsObstacle(trueX - 2, trueY + i))
                 left = false;
         }
-        if (current.getX() <= 0)
-            left = false;
         if (left)
             neighbors.add(cells[current.getX() - 1][current.getY()]);
 
         // check right
         for (int i = -1; i <= 1; ++i) {
-            if (grid.isOutOfArena(current.getX() + 3, current.getY() + i + 1))
-                right = false;
-            if (grid.getIsObstacle(current.getX() + 3, current.getY() + i + 1))
+            if (grid.isOutOfArena(trueX + 2, trueY + i) ||
+                    grid.getIsObstacle(trueX + 2, trueY + i))
                 right = false;
         }
-        if (current.getX() >= MAP_COLS - 3)
-            right = false;
         if (right)
             neighbors.add(cells[current.getX() + 1][current.getY()]);
-
-        if (neighbors.size() == 0)
-            System.out.println("No neighbors");
-        System.out.println("Generated neighbors");
 
         return neighbors;
     }
@@ -230,9 +294,9 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         return distance;
     }
 
-    private boolean isRobotInGoalZone(int x, int y) {
-        if (x == MAP_COLS - 2 && y == 1)
-            return true;
-        return false;
+    private void takeStep() {
+        try {
+            Thread.sleep(sleepDuration);
+        } catch (Exception e) {}
     }
 }
