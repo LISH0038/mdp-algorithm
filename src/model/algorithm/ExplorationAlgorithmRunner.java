@@ -2,7 +2,10 @@ package model.algorithm;
 
 import model.entity.Grid;
 import model.entity.Robot;
+import model.util.MessageGenerator;
+import model.util.SocketMgr;
 
+import static constant.CommConstants.TARGET_ANDROID;
 import static constant.RobotConstants.LEFT;
 import static constant.RobotConstants.RIGHT;
 
@@ -20,6 +23,10 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
     public void run(Grid grid, Robot robot, boolean realRun) {
         grid.reset();
         robot.reset();
+        //String msg = SocketMgr.getInstance().receiveMessage();
+        //while (!msg.equals("exs")) {
+        //    msg = SocketMgr.getInstance().receiveMessage();
+        //}
         runExplorationAlgorithmThorough(grid, robot);
         grid.generateDescriptor();
     }
@@ -28,6 +35,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         // MOVE OVER TO TOP LEFT CORNER OF ARENA.
         while (grid.checkExploredPercentage() != 100) {
             robot.sense();
+            //SocketMgr.getInstance().sendMessage(TARGET_ANDROID, MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid()));
             /*
             MAKE IT MOVE SLOWLY SO CAN SEE STEP BY STEP MOVEMENT
              */
@@ -48,11 +56,13 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                     robot.turn(LEFT);
                 }
                 robot.sense();
+                //SocketMgr.getInstance().sendMessage(TARGET_ANDROID, MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid()));
                 System.out.println("-----------------------------------------------");
             } else if (!robot.isObstacleLeft()) {
                 System.out.println("NO OBSTACLES ON THE LEFT! TURNING LEFT");
                 robot.turn(LEFT);
                 robot.sense();
+                //SocketMgr.getInstance().sendMessage(TARGET_ANDROID, MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid()));
                 System.out.println("-----------------------------------------------");
             }
             robot.move();
@@ -60,6 +70,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
 
         while (!Grid.isInStartZone(robot.getPosX() + 2, robot.getPosY())) {
             robot.sense();
+            //SocketMgr.getInstance().sendMessage(TARGET_ANDROID, MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid()));
             /*
             MAKE IT MOVE SLOWLY SO CAN SEE STEP BY STEP MOVEMENT
              */
@@ -80,11 +91,13 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                     robot.turn(LEFT);
                 }
                 robot.sense();
+                //SocketMgr.getInstance().sendMessage(TARGET_ANDROID, MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid()));
                 System.out.println("-----------------------------------------------");
             } else if (!robot.isObstacleLeft()) {
                 System.out.println("NO OBSTACLES ON THE LEFT! TURNING LEFT");
                 robot.turn(LEFT);
                 robot.sense();
+                //SocketMgr.getInstance().sendMessage(TARGET_ANDROID, MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid()));
                 System.out.println("-----------------------------------------------");
             }
             robot.move();
