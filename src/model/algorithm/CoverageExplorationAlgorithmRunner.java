@@ -45,57 +45,56 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
             Cell position = new Cell(robot.getPosX(), robot.getPosY());
             pathTaken.push(position);
             robot.sense();
-            /*
-            MAKE IT MOVE SLOWLY SO CAN SEE STEP BY STEP MOVEMENT
-             */
-            try {
-                Thread.sleep(sleepDuration);
-            } catch (Exception e) {
-            }
             if (robot.isObstacleAhead()) {
                 if (robot.isObstacleRight() && robot.isObstacleLeft()) {
                     System.out.println("OBSTACLE DETECTED! (ALL 3 SIDES) U-TURNING");
                     robot.turn(RIGHT);
+                    stepTaken();
                     robot.turn(RIGHT);
+                    stepTaken();
                 } else if (robot.isObstacleLeft()) {
                     System.out.println("OBSTACLE DETECTED! (FRONT + LEFT) TURNING RIGHT");
                     robot.turn(RIGHT);
+                    stepTaken();
                 } else {
                     System.out.println("OBSTACLE DETECTED! (FRONT) TURNING LEFT");
                     robot.turn(LEFT);
+                    stepTaken();
                 }
                 robot.sense();
                 System.out.println("-----------------------------------------------");
             } else if (!robot.isObstacleLeft()) {
                 System.out.println("NO OBSTACLES ON THE LEFT! TURNING LEFT");
                 robot.turn(LEFT);
+                stepTaken();
                 robot.sense();
                 System.out.println("-----------------------------------------------");
             }
             robot.move();
+            stepTaken();
         }
 
 
         while(!pathTaken.isEmpty()){
-            try {
-                Thread.sleep(sleepDuration);
-            } catch (Exception e) {
-            }
             Cell location = pathTaken.pop();
 
             if(location.getX() > robot.getPosX()){
                 switch(robot.getHeading()){
                     case 0: // NORTH
                         robot.turn(RIGHT);
+                        stepTaken();
                         break;
                     case 1: // EAST
                         break;
                     case 2: // SOUTH
                         robot.turn(LEFT);
+                        stepTaken();
                         break;
                     case 3: // WEST
                         robot.turn(RIGHT);
+                        stepTaken();
                         robot.turn(RIGHT);
+                        stepTaken();
                         break;
                     default:
                         break;
@@ -104,13 +103,17 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
                 switch(robot.getHeading()){
                     case 0: // NORTH
                         robot.turn(LEFT);
+                        stepTaken();
                         break;
                     case 1: // EAST
                         robot.turn(RIGHT);
+                        stepTaken();
                         robot.turn(RIGHT);
+                        stepTaken();
                         break;
                     case 2: // SOUTH
                         robot.turn(RIGHT);
+                        stepTaken();
                         break;
                     case 3: // WEST
                         break;
@@ -123,15 +126,19 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
                 switch(robot.getHeading()){
                     case 0: // NORTH
                         robot.turn(RIGHT);
+                        stepTaken();
                         robot.turn(RIGHT);
+                        stepTaken();
                         break;
                     case 1: // EAST
                         robot.turn(RIGHT);
+                        stepTaken();
                         break;
                     case 2: // SOUTH
                         break;
                     case 3: // WEST
                         robot.turn(LEFT);
+                        stepTaken();
                         break;
                     default:
                         break;
@@ -142,19 +149,34 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
                         break;
                     case 1: // EAST
                         robot.turn(LEFT);
+                        stepTaken();
                         break;
                     case 2: // SOUTH
                         robot.turn(LEFT);
+                        stepTaken();
                         robot.turn(LEFT);
+                        stepTaken();
                         break;
                     case 3: // WEST
                         robot.turn(RIGHT);
+                        stepTaken();
                         break;
                     default:
                         break;
                 }
             }
             robot.move();
+            stepTaken();
+        }
+    }
+
+    public void stepTaken(){
+        /*
+            MAKE IT MOVE SLOWLY SO CAN SEE STEP BY STEP MOVEMENT
+             */
+        try {
+            Thread.sleep(sleepDuration);
+        } catch (Exception e) {
         }
     }
 
