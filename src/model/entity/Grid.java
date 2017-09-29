@@ -8,7 +8,7 @@ import java.util.Observable;
 import static constant.MapConstants.*;
 
 /**
- * Created by koallen on 25/8/17.
+ * Grid for representing the map
  */
 public class Grid extends Observable {
 
@@ -54,7 +54,7 @@ public class Grid extends Observable {
         notifyObservers();
     }
 
-    public void setExplored(int x, int y, boolean explored) {
+    void setExplored(int x, int y, boolean explored) {
         if (isOutOfArena(x, y))
             return;
         cells[x][y].setExplored(explored);
@@ -62,7 +62,7 @@ public class Grid extends Observable {
         notifyObservers();
     }
 
-    public boolean getIsExplored(int x, int y) {
+    private boolean getIsExplored(int x, int y) {
         return !isOutOfArena(x, y) && cells[x][y].getExplored();
     }
 
@@ -98,7 +98,7 @@ public class Grid extends Observable {
         }
     }
 
-    public String generateDescriptor() {
+    public void generateDescriptor() {
         StringBuilder builder;
 
         // first build string for exploration status
@@ -145,16 +145,12 @@ public class Grid extends Observable {
         }
         System.out.println("Map descriptor part 2:");
         System.out.println(builder.toString());
-
-        return part1 + part2;
     }
 
     public String generateForAndroid() {
         StringBuilder builder;
 
-        // first build string for exploration status
         builder = new StringBuilder();
-        //builder.append(11);
         for (int y = 0; y < MAP_ROWS; y++) {
             for (int x = 0; x < MAP_COLS; x++) {
                 if (getIsExplored(x, y)) {
@@ -168,17 +164,13 @@ public class Grid extends Observable {
                 }
             }
         }
-        //builder.append(11);
         String part1 = builder.toString();
         builder = new StringBuilder();
         for (int i = 0; i < part1.length() / 4; i++) {
             builder.append(Integer.toHexString(Integer.parseInt(part1.substring(i * 4, (i + 1) * 4), 2)));
         }
-        String finalString = builder.toString();
-        System.out.println(finalString);
-        System.out.println(finalString.length());
 
-        return finalString;
+        return builder.toString();
     }
 
     /**
@@ -188,9 +180,17 @@ public class Grid extends Observable {
         for (int x = 0; x < MAP_COLS; x++) {
             for (int y = 0; y < MAP_ROWS; y++) {
                 if (!isInStartZone(x, y) && !isInEndZone(x, y))
-                    cells[x][y].setExplored(false);
+                    setExplored(x, y, false);
                 else
-                    cells[x][y].setExplored(true);
+                    setExplored(x, y, true);
+            }
+        }
+    }
+
+    public void clearObstacles() {
+        for (int x = 0; x < MAP_COLS; x++) {
+            for (int y = 0; y < MAP_ROWS; y++) {
+                setIsObstacle(x, y, false);
             }
         }
     }

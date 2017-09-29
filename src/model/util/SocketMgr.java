@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 /**
- * Created by koallen on 25/8/17.
+ * A singleton class for using the socket
  */
 public class SocketMgr {
 
@@ -26,7 +26,7 @@ public class SocketMgr {
         return mInstance;
     }
 
-    public void openConnection() {
+    private void openConnection() {
         try {
             mSocket = new Socket(ADDRESS, PORT);
             mSocketWriter = new PrintWriter(mSocket.getOutputStream(), true);
@@ -49,8 +49,8 @@ public class SocketMgr {
         System.out.println("Socket connection closed");
     }
 
-    public boolean isConnected() {
-        return mSocket.isConnected();
+    private boolean isConnected() {
+        return mSocket != null && mSocket.isConnected();
     }
 
     public void sendMessage(String dest, String msg) {

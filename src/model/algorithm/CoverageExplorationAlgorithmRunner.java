@@ -45,8 +45,8 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
         grid.generateDescriptor();
     }
 
-    public void coverageLimitedAlgorithm(Grid grid, Robot robot, int coveragePercentage){
-        LinkedList<Cell> pathTaken = new LinkedList<Cell>();
+    private void coverageLimitedAlgorithm(Grid grid, Robot robot, int coveragePercentage){
+        LinkedList<Cell> pathTaken = new LinkedList<>();
 
         while (grid.checkExploredPercentage() < coveragePercentage) {
             Cell position = new Cell(robot.getPosX(), robot.getPosY());
@@ -177,13 +177,14 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
         }
     }
 
-    public void stepTaken(){
+    private void stepTaken(){
         /*
             MAKE IT MOVE SLOWLY SO CAN SEE STEP BY STEP MOVEMENT
              */
         try {
             Thread.sleep(sleepDuration);
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

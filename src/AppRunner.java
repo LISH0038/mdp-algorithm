@@ -21,6 +21,7 @@ public class AppRunner {
             // models
             Grid grid = new Grid();
             setObstaclesMap(grid);
+            // TODO: change according to real sensors
             Sensor sensor1 = new Sensor(3, 0, 0, MIDDLE);
             Sensor sensor2 = new Sensor(3, 1, 0, MIDDLE);
             Sensor sensor3 = new Sensor(3, 2, 0, MIDDLE);
@@ -50,7 +51,7 @@ public class AppRunner {
         });
     }
 
-    public static void setObstaclesMap(Grid grid) {
+    private static void setObstaclesMap(Grid grid) {
         grid.setIsObstacle(11, 19, true);
         grid.setIsObstacle(11, 18, true);
         grid.setIsObstacle(11, 17, true);

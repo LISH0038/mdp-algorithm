@@ -10,6 +10,10 @@ import java.util.*;
 import static constant.RobotConstants.LEFT;
 import static constant.RobotConstants.RIGHT;
 
+/**
+ * Algorithm for exploration (time-limited)
+ */
+
 public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
 
     private int sleepDuration;
@@ -61,8 +65,8 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
         grid.generateDescriptor();
     }
 
-    public void timeLimitedAlgorithm(Grid grid, Robot robot, int totalTime){
-        LinkedList<Cell> pathTaken = new LinkedList<Cell>();
+    private void timeLimitedAlgorithm(Grid grid, Robot robot, int totalTime){
+        LinkedList<Cell> pathTaken = new LinkedList<>();
         System.out.println("Time-Limit = "+totalTime+" Seconds.");
         int millisecondsTotal = totalTime * 1000;
         boolean endZoneFlag = false;
@@ -209,13 +213,14 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
         }
     }
 
-    public void stepTaken(){
+    private void stepTaken(){
         /*
             MAKE IT MOVE SLOWLY SO CAN SEE STEP BY STEP MOVEMENT
              */
         try {
             Thread.sleep(sleepDuration);
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

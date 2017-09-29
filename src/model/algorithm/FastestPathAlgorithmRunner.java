@@ -4,6 +4,7 @@ import model.entity.Cell;
 import model.entity.Grid;
 import model.entity.Robot;
 import model.entity.Sensor;
+import model.util.MessageGenerator;
 import model.util.SocketMgr;
 
 import java.util.ArrayList;
@@ -11,12 +12,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import static constant.CommConstants.TARGET_ANDROID;
 import static constant.MapConstants.MAP_COLS;
 import static constant.MapConstants.MAP_ROWS;
 import static constant.RobotConstants.*;
 
 /**
- * Created by koallen on 25/8/17.
+ * Fastest path algorithm using A* search + customized score functions
  */
 public class FastestPathAlgorithmRunner implements AlgorithmRunner {
 
@@ -45,6 +47,7 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
             while ((waypoints = parseMessage(msg)) == null) {
                 msg = SocketMgr.getInstance().receiveMessage();
             }
+            // the coordinates in fastest path search is different from real grid coordinate
             wayPointX = waypoints.get(0)-1;
             wayPointY = waypoints.get(1)-1;
         } else {
@@ -65,7 +68,6 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
             System.out.println(path1.toString());
             if (realRun) {
                 // TODO: send actions to Arduino instead of running in simulator
-                takeStep();
                 for (String action : path1) {
                     if (action.equals("M")) {
                         robot.move();
@@ -74,10 +76,12 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
                     } else if (action.equals("R")) {
                         robot.turn(RIGHT);
                     }
+                    SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
+                            MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
+                                    robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
                     takeStep();
                 }
             } else {
-                takeStep();
                 for (String action : path1) {
                     if (action.equals("M")) {
                         robot.move();
@@ -96,15 +100,15 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
 
     private List<Integer> parseMessage(String msg) {
         String[] splitString = msg.split(",", 2);
-        List<Integer> waypoints = new ArrayList<>();
+        List<Integer> waypoint = new ArrayList<>();
 
-        Integer wayPointX = null, wayPointY = null;
+        Integer wayPointX, wayPointY;
         try {
             wayPointX = Integer.parseInt(splitString[0]);
-            wayPointY = Integer.parseInt(splitString[1]);
-            waypoints.add(wayPointX);
-            waypoints.add(wayPointY);
-            return waypoints;
+            wayPointY = MAP_ROWS - Integer.parseInt(splitString[1]) - 1;
+            waypoint.add(wayPointX);
+            waypoint.add(wayPointY);
+            return waypoint;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -113,12 +117,12 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
 
     /**
      * Run the A* algorithm from point (startX, startY) to (endX, endY)
-     * @param startX
-     * @param startY
-     * @param endX
-     * @param endY
-     * @param grid
-     * @param robot
+     * @param startX Start point x coordinate
+     * @param startY Start point y coordinate
+     * @param endX End point x coordinate
+     * @param endY End point y coordinate
+     * @param grid Map
+     * @param robot Robot
      * @return A list of actions for the robot to take to reach the goal
      */
     private List<String> runAstar(int startX, int startY, int endX, int endY, Grid grid, Robot robot) {
@@ -151,10 +155,10 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         // run algorithm
         while (!openSet.isEmpty()) {
             Cell current = getCurrent(openSet, fScore);
-            //System.out.println("Current: " + current.getX() + ", " + current.getY());
+            System.out.println("Current: " + current.getX() + ", " + current.getY());
             if (current.getX() == endX && current.getY() == endY) {
                 System.out.println("Reached goal");
-                return reconstructPath(grid, robot, current, cameFrom);
+                return reconstructPath(robot, current, cameFrom);
             }
 
             openSet.remove(current);
@@ -167,16 +171,20 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
                 if (!openSet.contains(neighbor))
                     openSet.add(neighbor);
 
-                int tentativeGScore = gScore[current.getX()][current.getY()] + 1; // TODO: should this always be 1?
+                int tentativeGScore = gScore[current.getX()][current.getY()] + 1;
+                Cell previousCell = cameFrom.get(current);
+                if (previousCell != null && previousCell.getX() != neighbor.getX() && previousCell.getY() != neighbor.getY())
+                    tentativeGScore += 1; // penalize turns
                 if (tentativeGScore >= gScore[neighbor.getX()][neighbor.getY()])
                     continue;
 
                 cameFrom.put(neighbor, current);
                 gScore[neighbor.getX()][neighbor.getY()] = tentativeGScore;
-                fScore[neighbor.getX()][neighbor.getY()] = tentativeGScore + estimateDistanceToGoal(neighbor.getX(), neighbor.getY(), GOAL_X, GOAL_Y);
+                fScore[neighbor.getX()][neighbor.getY()] = tentativeGScore + estimateDistanceToGoal(neighbor.getX(), neighbor.getY(), endX, endY);
             }
         }
 
+        System.out.println("No fastest path found.");
         return null;
     }
 
@@ -193,7 +201,7 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         return minCell;
     }
 
-    private List<String> reconstructPath(Grid grid, Robot robot, Cell current, HashMap<Cell, Cell> cameFrom) {
+    private List<String> reconstructPath(Robot robot, Cell current, HashMap<Cell, Cell> cameFrom) {
         // construct the path first
         List<Cell> path = new LinkedList<>();
         path.add(current);
@@ -289,7 +297,7 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
     private int estimateDistanceToGoal(int curX, int curY, int goalX, int goalY) {
         int distance = Math.abs(goalX - curX) + Math.abs(goalY - curY);
         if (curX != goalX && curY != goalY)
-            distance++;
+            distance += 1;
 
         return distance;
     }
@@ -297,6 +305,8 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
     private void takeStep() {
         try {
             Thread.sleep(sleepDuration);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

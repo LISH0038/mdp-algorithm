@@ -1,7 +1,7 @@
 package constant;
 
 /**
- * Created by koallen on 22/9/17.
+ * Constants for communication
  */
 public class CommConstants {
 

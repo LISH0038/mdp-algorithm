@@ -1,9 +1,8 @@
 package model.entity;
 
-import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte1.other;
 
 /**
- * Created by koallen on 25/8/17.
+ * Represents a cell in the grid
  */
 public class Cell implements Comparable<Cell> {
 
@@ -13,18 +12,18 @@ public class Cell implements Comparable<Cell> {
     private boolean mExplored = false;
     private boolean mIsObstacle = false;
 
-    public Cell() {}
+    Cell() {}
 
     public Cell(int x, int y) {
         mX = x;
         mY = y;
     }
 
-    public void setExplored(boolean explored) {
+    void setExplored(boolean explored) {
         mExplored = explored;
     }
 
-    public void setIsObstacle(boolean isObstacle) {
+    void setIsObstacle(boolean isObstacle) {
         mIsObstacle = isObstacle;
     }
 
@@ -48,7 +47,7 @@ public class Cell implements Comparable<Cell> {
         mDistance = distance;
     }
 
-    public int getDistance() {
+    private int getDistance() {
         return mDistance;
     }
 

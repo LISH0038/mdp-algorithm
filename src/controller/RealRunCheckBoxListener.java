@@ -1,12 +1,13 @@
 package controller;
 
+import model.util.SocketMgr;
 import view.Simulator;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Created by koallen on 29/9/17.
+ * Button listener
  */
 public class RealRunCheckBoxListener implements ActionListener {
 

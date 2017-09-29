@@ -6,7 +6,7 @@ import java.util.Observable;
 import static constant.RobotConstants.*;
 
 /**
- * Created by koallen on 25/8/17.
+ * Represents the physical robot
  */
 public class Robot extends Observable {
     private int mPosX = START_POS_X;

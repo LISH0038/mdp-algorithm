@@ -3,7 +3,7 @@ package model.entity;
 import static constant.RobotConstants.*;
 
 /**
- * Created by koallen on 25/8/17.
+ * Models the sensors
  */
 public class Sensor {
 
@@ -20,7 +20,7 @@ public class Sensor {
         mDirection = direction;
     }
 
-    public int sense(Grid grid) {
+    int sense(Grid grid) {
         int absPosX = getActualPosX();
         int absPosY = getActualPosY();
 
@@ -44,7 +44,7 @@ public class Sensor {
         return 0;
     }
 
-    public int getActualHeading() {
+    int getActualHeading() {
         /*
         NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3
          */
@@ -59,7 +59,7 @@ public class Sensor {
         return actualDirection;
     }
 
-    public int getActualPosX() {
+    int getActualPosX() {
         if (mRobot.getHeading() == NORTH) {
             return getCorrectedRobotPosX() + mPosX;
         } else if (mRobot.getHeading() == EAST) {
@@ -72,7 +72,7 @@ public class Sensor {
         return 0;
     }
 
-    public int getActualPosY() {
+    int getActualPosY() {
         if (mRobot.getHeading() == NORTH) {
             return getCorrectedRobotPosY() + mPosY;
         } else if (mRobot.getHeading() == EAST) {
@@ -89,9 +89,9 @@ public class Sensor {
      * As the sensor location is relative to the robot, the corrected robot location
      * (i.e. considering heading) needs to be calculated to be the base location for
      * calculating sensor location
-     * @return
+     * @return X coordinate for sensor calculation
      */
-    public int getCorrectedRobotPosX() {
+    private int getCorrectedRobotPosX() {
         /*
          * ROBOT'S MOST WEST POINT IN THE ARENA
          * THEREFORE, MUST ADD 2 WHEN FACING EAST (FOR SENSORS IN MIDDLE)
@@ -106,9 +106,9 @@ public class Sensor {
      * As the sensor location is relative to the robot, the corrected robot location
      * (i.e. considering heading) needs to be calculated to be the base location for
      * calculating sensor location
-     * @return
+     * @return Y coordinate for sensor calculation
      */
-    public int getCorrectedRobotPosY() {
+    private int getCorrectedRobotPosY() {
         /*
          * ROBOT'S MOST NORTH POINT IN THE ARENA
          * THEREFORE, MUST ADD 2 WHEN FACING SOUTH (FOR SENSORS IN MIDDLE)
@@ -119,7 +119,7 @@ public class Sensor {
         return mRobot.getPosY();
     }
 
-    public int getRange() {
+    int getRange() {
         return mRange;
     }
 

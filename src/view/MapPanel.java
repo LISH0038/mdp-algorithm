@@ -13,14 +13,14 @@ import static constant.MapConstants.*;
 import static constant.RobotConstants.*;
 
 /**
- * Created by koallen on 26/8/17.
+ * Map UI
  */
 public class MapPanel extends JPanel implements Observer {
 
     private Grid mGrid;
     private Robot mRobot;
 
-    public MapPanel(Grid grid, Robot robot) {
+    MapPanel(Grid grid, Robot robot) {
         mGrid = grid;
         mRobot = robot;
         initializeMap();

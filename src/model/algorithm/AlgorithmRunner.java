@@ -4,7 +4,7 @@ import model.entity.Grid;
 import model.entity.Robot;
 
 /**
- * Created by koallen on 25/8/17.
+ * Interface for algorithms
  */
 public interface AlgorithmRunner {
     void run(Grid grid, Robot robot, boolean realRun);

@@ -1,7 +1,7 @@
 package constant;
 
 /**
- * Created by koallen on 26/8/17.
+ * Constants for map
  */
 public class MapConstants {
     public static final int MAP_ROWS = 20;

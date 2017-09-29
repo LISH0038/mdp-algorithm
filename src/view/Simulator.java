@@ -1,6 +1,5 @@
 package view;
 
-import com.sun.deploy.util.StringUtils;
 import model.entity.Grid;
 import model.entity.Robot;
 

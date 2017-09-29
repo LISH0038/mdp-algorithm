@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 /**
- * Created by koallen on 26/8/17.
+ * Button listener
  */
 public class LoadMapButtonListener implements ActionListener {
 
