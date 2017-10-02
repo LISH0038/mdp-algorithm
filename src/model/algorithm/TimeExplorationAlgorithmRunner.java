@@ -61,11 +61,11 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
 
         int totalTime = (minutes*60) + seconds;
         System.out.println("Total time: " + totalTime + " seconds");
-        timeLimitedAlgorithm(grid, robot, totalTime);
+        timeLimitedAlgorithm(grid, robot, totalTime, realRun);
         grid.generateDescriptor();
     }
 
-    private void timeLimitedAlgorithm(Grid grid, Robot robot, int totalTime){
+    private void timeLimitedAlgorithm(Grid grid, Robot robot, int totalTime, boolean realRun){
         LinkedList<Cell> pathTaken = new LinkedList<>();
         System.out.println("Time-Limit = "+totalTime+" Seconds.");
         int millisecondsTotal = totalTime * 1000;
@@ -74,7 +74,7 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
         while (millisecondsTotal > 0 && (!endZoneFlag || !startZoneFlag)) {
             Cell position = new Cell(robot.getPosX(), robot.getPosY());
             pathTaken.push(position);
-            robot.sense();
+            robot.sense(realRun);
             if (robot.isObstacleAhead()) {
                 if (robot.isObstacleRight() && robot.isObstacleLeft()) {
                     System.out.println("OBSTACLE DETECTED! (ALL 3 SIDES) U-TURNING");
@@ -94,14 +94,14 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
                     stepTaken();
                     millisecondsTotal = millisecondsTotal - sleepDuration;
                 }
-                robot.sense();
+                robot.sense(realRun);
                 System.out.println("-----------------------------------------------");
             } else if (!robot.isObstacleLeft()) {
                 System.out.println("NO OBSTACLES ON THE LEFT! TURNING LEFT");
                 robot.turn(LEFT);
                 stepTaken();
                 millisecondsTotal = millisecondsTotal - sleepDuration;
-                robot.sense();
+                robot.sense(realRun);
                 System.out.println("-----------------------------------------------");
             }
             robot.move();

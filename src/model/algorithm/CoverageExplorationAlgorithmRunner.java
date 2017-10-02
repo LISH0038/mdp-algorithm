@@ -41,17 +41,17 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
                 JOptionPane.showMessageDialog(null, "Please enter an integer more than 0!", "Error!", JOptionPane.ERROR_MESSAGE);
             }
         }while(coveragePercentage == 0);
-        coverageLimitedAlgorithm(grid, robot, coveragePercentage);
+        coverageLimitedAlgorithm(grid, robot, coveragePercentage, realRun);
         grid.generateDescriptor();
     }
 
-    private void coverageLimitedAlgorithm(Grid grid, Robot robot, int coveragePercentage){
+    private void coverageLimitedAlgorithm(Grid grid, Robot robot, int coveragePercentage, boolean realRun){
         LinkedList<Cell> pathTaken = new LinkedList<>();
 
         while (grid.checkExploredPercentage() < coveragePercentage) {
             Cell position = new Cell(robot.getPosX(), robot.getPosY());
             pathTaken.push(position);
-            robot.sense();
+            robot.sense(realRun);
             if (robot.isObstacleAhead()) {
                 if (robot.isObstacleRight() && robot.isObstacleLeft()) {
                     System.out.println("OBSTACLE DETECTED! (ALL 3 SIDES) U-TURNING");
@@ -68,13 +68,13 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
                     robot.turn(LEFT);
                     stepTaken();
                 }
-                robot.sense();
+                robot.sense(realRun);
                 System.out.println("-----------------------------------------------");
             } else if (!robot.isObstacleLeft()) {
                 System.out.println("NO OBSTACLES ON THE LEFT! TURNING LEFT");
                 robot.turn(LEFT);
                 stepTaken();
-                robot.sense();
+                robot.sense(realRun);
                 System.out.println("-----------------------------------------------");
             }
             robot.move();
