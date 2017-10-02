@@ -1,5 +1,7 @@
 package model.entity;
 
+import model.util.SocketMgr;
+
 import java.util.List;
 import java.util.Observable;
 
@@ -197,17 +199,34 @@ public class Robot extends Observable {
         }
     }
 
-    public void sense() {
-        for (Sensor sensor : mSensors) {
+    /**
+     * Sense the robot's surrounding environment
+     * @param realRun whether it's the physical robot
+     */
+    public void sense(boolean realRun) {
+        if (realRun) {
+            String sensorData = SocketMgr.getInstance().receiveMessage();
+            String[] sensorReadings = sensorData.split(",", mSensors.size());
+            for (int i = 0; i < mSensors.size(); i++) {
+                int returnedDistance = Integer.parseInt(sensorReadings[i]);
+                int heading = mSensors.get(i).getActualHeading();
+                int range = mSensors.get(i).getRange();
+                int x = mSensors.get(i).getActualPosX();
+                int y = mSensors.get(i).getActualPosY();
+                updateMap(returnedDistance, heading, range, x, y);
+            }
+        } else {
+            for (Sensor sensor : mSensors) {
             /*
             SENSE RETURNS 0 IF NO OBSTACLES IS DETECTED
              */
-            int returnedDistance = sensor.sense(mGrid);
-            int heading = sensor.getActualHeading();
-            int range = sensor.getRange();
-            int x = sensor.getActualPosX();
-            int y = sensor.getActualPosY();
-            updateMap(returnedDistance, heading, range, x, y);
+                int returnedDistance = sensor.sense(mGrid);
+                int heading = sensor.getActualHeading();
+                int range = sensor.getRange();
+                int x = sensor.getActualPosX();
+                int y = sensor.getActualPosY();
+                updateMap(returnedDistance, heading, range, x, y);
+            }
         }
     }
 }

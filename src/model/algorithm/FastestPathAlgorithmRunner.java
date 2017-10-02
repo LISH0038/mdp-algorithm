@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static constant.CommConstants.TARGET_ANDROID;
+import static constant.CommConstants.TARGET_ARDUINO;
 import static constant.MapConstants.MAP_COLS;
 import static constant.MapConstants.MAP_ROWS;
 import static constant.RobotConstants.*;
@@ -68,20 +69,25 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
             System.out.println(path1.toString());
             if (realRun) {
                 // TODO: send actions to Arduino instead of running in simulator
-                for (String action : path1) {
-                    if (action.equals("M")) {
-                        robot.move();
-                    } else if (action.equals("L")) {
-                        robot.turn(LEFT);
-                    } else if (action.equals("R")) {
-                        robot.turn(RIGHT);
-                    }
-                    SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
-                            MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
-                                    robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
-                    takeStep();
-                }
+                String compressedPath = compressPath(path1);
+                System.out.println(compressedPath);
+                SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, compressedPath);
+                //for (String action : path1) {
+                //    if (action.equals("M")) {
+                //        robot.move();
+                //    } else if (action.equals("L")) {
+                //        robot.turn(LEFT);
+                //    } else if (action.equals("R")) {
+                //        robot.turn(RIGHT);
+                //    }
+                //    SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
+                //            MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
+                //                    robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
+                //    takeStep();
+                //}
             } else {
+                String compressedPath = compressPath(path1);
+                System.out.println(compressedPath);
                 for (String action : path1) {
                     if (action.equals("M")) {
                         robot.move();
@@ -96,6 +102,31 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         } else {
             System.out.println("Fastest path not found!");
         }
+    }
+
+    private String compressPath(List<String> actions) {
+        int moveCounter = 0;
+        StringBuilder builder = new StringBuilder();
+
+        for (String action : actions) {
+            // TODO: consider U turn?
+            if (action.equals("L") || action.equals("R")) {
+                if (moveCounter != 0) {
+                    builder.append("M");
+                    builder.append(String.format("%02d", moveCounter));
+                    moveCounter = 0;
+                }
+                builder.append(action);
+            } else if (action.equals("M")) {
+                moveCounter++;
+            }
+        }
+        if (moveCounter != 0) {
+            builder.append("M");
+            builder.append(String.format("%02d", moveCounter));
+        }
+
+        return builder.toString();
     }
 
     private List<Integer> parseMessage(String msg) {
