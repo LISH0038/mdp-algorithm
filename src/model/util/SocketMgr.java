@@ -74,4 +74,15 @@ public class SocketMgr {
 
         return null;
     }
+
+    public void clearInputBuffer() {
+        String input;
+        try {
+            while ((input = mSocketReader.readLine()) != null) {
+                System.out.println("Discarded message: " + input);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
