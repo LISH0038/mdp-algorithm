@@ -5,6 +5,7 @@ import model.util.SocketMgr;
 import java.util.List;
 import java.util.Observable;
 
+import static constant.CommConstants.TARGET_ARDUINO;
 import static constant.RobotConstants.*;
 
 /**
@@ -177,8 +178,8 @@ public class Robot extends Observable {
 
     private void updateMap(int returnedDistance, int heading, int range, int x, int y) {
         int xToUpdate = x, yToUpdate = y;
-        int distance = returnedDistance == 0 ? range : returnedDistance;
-        boolean obstacleAhead = returnedDistance != 0;
+        int distance = returnedDistance > range ? range : returnedDistance;
+        boolean obstacleAhead = returnedDistance < range;
 
         for (int i = 1; i <= distance; i++) {
             if (heading == NORTH) {

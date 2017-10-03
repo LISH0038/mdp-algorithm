@@ -20,19 +20,20 @@ public class AppRunner {
         SwingUtilities.invokeLater(() -> {
             // models
             Grid grid = new Grid();
-            setObstaclesMap(grid);
-            // TODO: change according to real sensors
-            Sensor sensor1 = new Sensor(3, 0, 0, MIDDLE);
-            Sensor sensor2 = new Sensor(3, 1, 0, MIDDLE);
-            Sensor sensor3 = new Sensor(3, 2, 0, MIDDLE);
-            Sensor sensor4 = new Sensor(6, 2, 0, RIGHT);
-            Sensor sensor5 = new Sensor(3, 0, 0, LEFT);
+            //setObstaclesMap(grid);
+            Sensor sensor1 = new Sensor(3, 0, 0, LEFT);
+            Sensor sensor2 = new Sensor(2, 0, 2, LEFT);
+            Sensor sensor3 = new Sensor(3, 0, 0, MIDDLE);
+            Sensor sensor4 = new Sensor(3, 2, 0, MIDDLE);
+            Sensor sensor5 = new Sensor(2, 1, 0, MIDDLE);
+            Sensor sensor6 = new Sensor(5, 1, 0, RIGHT);
             List<Sensor> sensors = new ArrayList<>();
             sensors.add(sensor1);
             sensors.add(sensor2);
             sensors.add(sensor3);
             sensors.add(sensor4);
             sensors.add(sensor5);
+            sensors.add(sensor6);
             Robot robot = new Robot(grid, sensors);
 
             // view

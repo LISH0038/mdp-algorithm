@@ -43,7 +43,7 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         if (realRun) {
             // receive from Android
             System.out.println("Waiting for waypoint");
-            SocketMgr.getInstance().clearInputBuffer();
+            //SocketMgr.getInstance().clearInputBuffer();
             String msg = SocketMgr.getInstance().receiveMessage();
             List<Integer> waypoints;
             while ((waypoints = parseMessage(msg)) == null) {
@@ -114,7 +114,7 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
             if (action.equals("L") || action.equals("R")) {
                 if (moveCounter != 0) {
                     builder.append("M");
-                    builder.append(String.format("%02d", moveCounter));
+                    builder.append(moveCounter);
                     moveCounter = 0;
                 }
                 builder.append(action);

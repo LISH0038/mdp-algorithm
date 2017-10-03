@@ -29,9 +29,11 @@ public class ExplorationButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("Exploration button pressed");
-        if (mView.getRobotSpeed() == 0) {
-            JOptionPane.showMessageDialog(null, "Please set robot speed! (X Steps per second)", "Fastest path", JOptionPane.ERROR_MESSAGE);
-        }
+        //if (!mView.getIsRealRun()) {
+            if (mView.getRobotSpeed() == 0) {
+                JOptionPane.showMessageDialog(null, "Please set robot speed! (X Steps per second)", "Fastest path", JOptionPane.ERROR_MESSAGE);
+            }
+        //}
         mView.disableButtons();
         new ExplorationWorker().execute();
     }

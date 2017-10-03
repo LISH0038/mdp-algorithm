@@ -22,6 +22,8 @@ public class RealRunCheckBoxListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (mView.getIsRealRun()) {
             mView.disableLoadMapButton();
+            if (!SocketMgr.getInstance().isConnected())
+                SocketMgr.getInstance().openConnection();
         } else {
             mView.enableLoadMapButton();
         }

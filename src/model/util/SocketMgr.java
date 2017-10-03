@@ -26,7 +26,7 @@ public class SocketMgr {
         return mInstance;
     }
 
-    private void openConnection() {
+    public void openConnection() {
         try {
             mSocket = new Socket(ADDRESS, PORT);
             mSocketWriter = new PrintWriter(mSocket.getOutputStream(), true);
@@ -49,20 +49,20 @@ public class SocketMgr {
         System.out.println("Socket connection closed");
     }
 
-    private boolean isConnected() {
+    public boolean isConnected() {
         return mSocket != null && mSocket.isConnected();
     }
 
     public void sendMessage(String dest, String msg) {
-        if (!isConnected())
-            openConnection();
+        //if (!isConnected())
+        //    openConnection();
         mSocketWriter.println(dest + msg);
         System.out.println("Sent message: " + dest + msg);
     }
 
     public String receiveMessage() {
-        if (!isConnected())
-            openConnection();
+        //if (!isConnected())
+        //    openConnection();
         try {
             String msg = mSocketReader.readLine();
             System.out.println("Received message: " + msg);
