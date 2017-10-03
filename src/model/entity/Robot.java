@@ -176,10 +176,21 @@ public class Robot extends Observable {
         notifyObservers();
     }
 
+    /**
+     * Updates the simulator's map according to sensor reading. If the sensor reading
+     * is smaller or equal to its range, it means there is an obstacle at that distance.
+     * If the sensor reading is greater than its range, it means there is no obstacle
+     * within its detectable range.
+     * @param returnedDistance
+     * @param heading
+     * @param range
+     * @param x
+     * @param y
+     */
     private void updateMap(int returnedDistance, int heading, int range, int x, int y) {
         int xToUpdate = x, yToUpdate = y;
-        int distance = returnedDistance > range ? range : returnedDistance;
-        boolean obstacleAhead = returnedDistance < range;
+        int distance = Math.min(returnedDistance, range);
+        boolean obstacleAhead = returnedDistance <= range;
 
         for (int i = 1; i <= distance; i++) {
             if (heading == NORTH) {
@@ -218,9 +229,6 @@ public class Robot extends Observable {
             }
         } else {
             for (Sensor sensor : mSensors) {
-            /*
-            SENSE RETURNS 0 IF NO OBSTACLES IS DETECTED
-             */
                 int returnedDistance = sensor.sense(mGrid);
                 int heading = sensor.getActualHeading();
                 int range = sensor.getRange();

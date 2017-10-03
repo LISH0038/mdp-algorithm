@@ -20,6 +20,13 @@ public class Sensor {
         mDirection = direction;
     }
 
+    /**
+     * Return the distance of obstacle (if any) from the current sensor's
+     * absolute position in the grid. If no obstacle is found, it returns
+     * a large value.
+     * @param grid
+     * @return
+     */
     int sense(Grid grid) {
         int absPosX = getActualPosX();
         int absPosY = getActualPosY();
@@ -41,7 +48,7 @@ public class Sensor {
                     return i;
             }
         }
-        return 0;
+        return 100;
     }
 
     int getActualHeading() {

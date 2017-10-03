@@ -62,7 +62,7 @@ public class Grid extends Observable {
         notifyObservers();
     }
 
-    private boolean getIsExplored(int x, int y) {
+    public boolean getIsExplored(int x, int y) {
         return !isOutOfArena(x, y) && cells[x][y].getExplored();
     }
 

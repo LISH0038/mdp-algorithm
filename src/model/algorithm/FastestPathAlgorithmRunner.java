@@ -69,9 +69,7 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
             path1.addAll(path2);
             System.out.println(path1.toString());
             if (realRun) {
-                // TODO: send actions to Arduino instead of running in simulator
                 String compressedPath = compressPath(path1);
-                System.out.println(compressedPath);
                 SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, compressedPath);
                 //for (String action : path1) {
                 //    if (action.equals("M")) {
@@ -87,8 +85,6 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
                 //    takeStep();
                 //}
             } else {
-                String compressedPath = compressPath(path1);
-                System.out.println(compressedPath);
                 for (String action : path1) {
                     if (action.equals("M")) {
                         robot.move();
@@ -96,6 +92,9 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
                         robot.turn(LEFT);
                     } else if (action.equals("R")) {
                         robot.turn(RIGHT);
+                    } else if (action.equals("U")) {
+                        robot.turn(LEFT);
+                        robot.turn(LEFT);
                     }
                     takeStep();
                 }
@@ -105,13 +104,19 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         }
     }
 
+    /**
+     * Convert the list of actions into a single string for sending
+     * to Arduino. Specifically, consecutive moves are compressed to the
+     * format "M5" to represent moving 5 cells at once.
+     * @param actions Actions to perform
+     * @return A string representing the actions
+     */
     private String compressPath(List<String> actions) {
         int moveCounter = 0;
         StringBuilder builder = new StringBuilder();
 
         for (String action : actions) {
-            // TODO: consider U turn?
-            if (action.equals("L") || action.equals("R")) {
+            if (action.equals("L") || action.equals("R") || action.equals("U")) {
                 if (moveCounter != 0) {
                     builder.append("M");
                     builder.append(moveCounter);
@@ -124,12 +129,18 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         }
         if (moveCounter != 0) {
             builder.append("M");
-            builder.append(String.format("%02d", moveCounter));
+            builder.append(moveCounter);
         }
 
         return builder.toString();
     }
 
+    /**
+     * Parse waypoint message from Android, the Y coordinate received
+     * starts from the bottom, so it's reversed.
+     * @param msg
+     * @return
+     */
     private List<Integer> parseMessage(String msg) {
         String[] splitString = msg.split(",", 2);
         List<Integer> waypoint = new ArrayList<>();
@@ -220,6 +231,12 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         return null;
     }
 
+    /**
+     * Select a cell from the openset with lowest f score.
+     * @param openSet
+     * @param fScore
+     * @return
+     */
     private Cell getCurrent(List<Cell> openSet, int[][] fScore) {
         Cell minCell = null;
         int minF = INFINITY;
@@ -233,6 +250,13 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         return minCell;
     }
 
+    /**
+     * Reconstructs the path of an Astar run after reaching the goal
+     * @param robot
+     * @param current
+     * @param cameFrom
+     * @return
+     */
     private List<String> reconstructPath(Robot robot, Cell current, HashMap<Cell, Cell> cameFrom) {
         // construct the path first
         List<Cell> path = new LinkedList<>();
@@ -265,9 +289,8 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
                     actions.add("L");
                     robot.turn(LEFT);
                 } else {
-                    actions.add("L");
+                    actions.add("U");
                     robot.turn(LEFT);
-                    actions.add("L");
                     robot.turn(LEFT);
                 }
             }
@@ -278,42 +301,54 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         return actions;
     }
 
+    /**
+     * Generate a list of neighbors available for moving (i.e. it
+     * cannot be out of arena, or an obstacle, or unexplored)
+     * @param grid
+     * @param current
+     * @param cells
+     * @return
+     */
     private List<Cell> generateNeighbor(Grid grid, Cell current, Cell[][] cells) {
         boolean left = true, right = true, front = true, back = true;
         List<Cell> neighbors = new ArrayList<>();
 
         int trueX = current.getX() + 1, trueY = current.getY() + 1;
-        // check front
+        // check north
         for (int i = -1; i <= 1; ++i) {
             if (grid.isOutOfArena(trueX + i, trueY - 2) ||
-                    grid.getIsObstacle(trueX + i, trueY - 2))
+                    grid.getIsObstacle(trueX + i, trueY - 2) ||
+                    !grid.getIsExplored(trueX + i, trueY - 2))
                 front = false;
         }
         if (front)
             neighbors.add(cells[current.getX()][current.getY() - 1]);
 
-        // check back
+        // check south
         for (int i = -1; i <= 1; ++i) {
             if (grid.isOutOfArena(trueX + i, trueY + 2) ||
-                    grid.getIsObstacle(trueX + i, trueY + 2))
+                    grid.getIsObstacle(trueX + i, trueY + 2) ||
+                    !grid.getIsExplored(trueX + i, trueY + 2))
                 back = false;
         }
         if (back)
             neighbors.add(cells[current.getX()][current.getY() + 1]);
 
-        // check left
+        // check west
         for (int i = -1; i <= 1; ++i) {
             if (grid.isOutOfArena(trueX - 2, trueY + i) ||
-                    grid.getIsObstacle(trueX - 2, trueY + i))
+                    grid.getIsObstacle(trueX - 2, trueY + i) ||
+                    !grid.getIsExplored(trueX - 2, trueY + i))
                 left = false;
         }
         if (left)
             neighbors.add(cells[current.getX() - 1][current.getY()]);
 
-        // check right
+        // check east
         for (int i = -1; i <= 1; ++i) {
             if (grid.isOutOfArena(trueX + 2, trueY + i) ||
-                    grid.getIsObstacle(trueX + 2, trueY + i))
+                    grid.getIsObstacle(trueX + 2, trueY + i) ||
+                    !grid.getIsExplored(trueX + 2, trueY + i))
                 right = false;
         }
         if (right)
@@ -323,17 +358,21 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
     }
 
     /**
-     * Calculates the estimated distance from (curX, curY) to (goalX, goalY)
-     * The estimation is based on the Manhattan distance
+     * Calculates the estimated distance from (curX, curY) to (goalX, goalY).
+     * The estimation is based on the Manhattan distance. If a turn is unavoidable,
+     * a penalty of 1 is added to the distance.
      */
     private int estimateDistanceToGoal(int curX, int curY, int goalX, int goalY) {
         int distance = Math.abs(goalX - curX) + Math.abs(goalY - curY);
-        if (curX != goalX && curY != goalY)
+        if (curX != goalX && curY != goalY) // we must turn at least once
             distance += 1;
 
         return distance;
     }
 
+    /**
+     * Pause the simulation for sleepDuration
+     */
     private void takeStep() {
         try {
             Thread.sleep(sleepDuration);
