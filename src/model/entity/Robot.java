@@ -26,12 +26,25 @@ public class Robot extends Observable {
         }
     }
 
+    public boolean isInRobot(int x, int y) {
+        return x < getPosX()+2 && x >= getPosX()
+                && y < getPosY()+2 && y >= getPosY();
+    }
+
     public int getPosX() {
         return mPosX;
     }
 
     public int getPosY() {
         return mPosY;
+    }
+
+    public void setPosX(int posX) {
+        mPosX = posX;
+    }
+
+    public void setPosY(int posY) {
+        mPosY = posY;
     }
 
     public int getCenterPosX() {
@@ -44,6 +57,10 @@ public class Robot extends Observable {
 
     public int getHeading() {
         return mHeading;
+    }
+
+    public void setHeading(int heading) {
+        mHeading = heading;
     }
 
     public boolean isObstacleAhead() {

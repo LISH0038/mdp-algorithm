@@ -14,6 +14,9 @@ import static constant.RobotConstants.RIGHT;
 public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
 
     private int sleepDuration;
+    private static final int START_X = 0;
+    private static final int START_Y = 17;
+
     public CoverageExplorationAlgorithmRunner(int speed){
         sleepDuration = 1000 / speed;
     }
@@ -45,12 +48,10 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
         grid.generateDescriptor();
     }
 
-    private void coverageLimitedAlgorithm(Grid grid, Robot robot, int coveragePercentage, boolean realRun){
-        LinkedList<Cell> pathTaken = new LinkedList<>();
+    private void coverageLimitedAlgorithm(Grid grid, Robot robot, int coveragePercentage, boolean realRun) {
 
         while (grid.checkExploredPercentage() < coveragePercentage) {
             Cell position = new Cell(robot.getPosX(), robot.getPosY());
-            pathTaken.push(position);
             robot.sense(realRun);
             if (robot.isObstacleAhead()) {
                 if (robot.isObstacleRight() && robot.isObstacleLeft()) {
@@ -81,99 +82,31 @@ public class CoverageExplorationAlgorithmRunner implements AlgorithmRunner{
             stepTaken();
         }
 
+        Robot fakeRobot = new Robot(grid, new ArrayList<>());
+        fakeRobot.setPosX(robot.getPosX());
+        fakeRobot.setPosY(robot.getPosY());
+        fakeRobot.setHeading(robot.getHeading());
+        List<String> returnPath = AlgorithmRunner.runAstar(robot.getPosX(), robot.getPosY(), START_X, START_Y, grid, fakeRobot);
 
-        while(!pathTaken.isEmpty()){
-            Cell location = pathTaken.pop();
+        if (returnPath != null) {
+            System.out.println("Algorithm finished, executing actions");
+            System.out.println(returnPath.toString());
 
-            if(location.getX() > robot.getPosX()){
-                switch(robot.getHeading()){
-                    case 0: // NORTH
-                        robot.turn(RIGHT);
-                        stepTaken();
-                        break;
-                    case 1: // EAST
-                        break;
-                    case 2: // SOUTH
-                        robot.turn(LEFT);
-                        stepTaken();
-                        break;
-                    case 3: // WEST
-                        robot.turn(RIGHT);
-                        stepTaken();
-                        robot.turn(RIGHT);
-                        stepTaken();
-                        break;
-                    default:
-                        break;
+            for (String action : returnPath) {
+                if (action.equals("M")) {
+                    robot.move();
+                } else if (action.equals("L")) {
+                    robot.turn(LEFT);
+                } else if (action.equals("R")) {
+                    robot.turn(RIGHT);
+                } else if (action.equals("U")) {
+                    robot.turn(LEFT);
+                    robot.turn(LEFT);
                 }
-            }else if(location.getX() < robot.getPosX()){
-                switch(robot.getHeading()){
-                    case 0: // NORTH
-                        robot.turn(LEFT);
-                        stepTaken();
-                        break;
-                    case 1: // EAST
-                        robot.turn(RIGHT);
-                        stepTaken();
-                        robot.turn(RIGHT);
-                        stepTaken();
-                        break;
-                    case 2: // SOUTH
-                        robot.turn(RIGHT);
-                        stepTaken();
-                        break;
-                    case 3: // WEST
-                        break;
-                    default:
-                        break;
-                }
+                stepTaken();
             }
-
-            if(location.getY() > robot.getPosY()){
-                switch(robot.getHeading()){
-                    case 0: // NORTH
-                        robot.turn(RIGHT);
-                        stepTaken();
-                        robot.turn(RIGHT);
-                        stepTaken();
-                        break;
-                    case 1: // EAST
-                        robot.turn(RIGHT);
-                        stepTaken();
-                        break;
-                    case 2: // SOUTH
-                        break;
-                    case 3: // WEST
-                        robot.turn(LEFT);
-                        stepTaken();
-                        break;
-                    default:
-                        break;
-                }
-            }else if(location.getY() < robot.getPosY()){
-                switch(robot.getHeading()){
-                    case 0: // NORTH
-                        break;
-                    case 1: // EAST
-                        robot.turn(LEFT);
-                        stepTaken();
-                        break;
-                    case 2: // SOUTH
-                        robot.turn(LEFT);
-                        stepTaken();
-                        robot.turn(LEFT);
-                        stepTaken();
-                        break;
-                    case 3: // WEST
-                        robot.turn(RIGHT);
-                        stepTaken();
-                        break;
-                    default:
-                        break;
-                }
-            }
-            robot.move();
-            stepTaken();
+        }else {
+            System.out.println("Fastest path not found!");
         }
     }
 
