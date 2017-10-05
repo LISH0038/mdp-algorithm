@@ -130,108 +130,76 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         // SWEEPING THROUGH UNEXPLORED, BUT REACHABLE CELLS WITHIN ARENA.
         if(grid.checkExploredPercentage() != 100){ // CHECK FOR UNEXPLORED CELLS
             for (int y = MAP_ROWS; y >= 0; y--) {
-                for (int x = MAP_COLS-1; x >= 0; x--) {
-                    if(!grid.getIsExplored(x, y)){ // CHECK FOR UNEXPLORED CELLS
-                        if(checkUnexplored(robot, grid, x+1, y, realRun)){ // CHECK IF NEIGHBOURS ARE REACHABLE OR NOT
-                            boolean startPointFlag = true;
-                            while(startPointFlag){ // SET STARTPOINTFLAG TO TRUE TO INITIATE LEFT-WALL-FOLLOWER
-                                leftWallFollower(robot, grid, realRun);
-                                // AS LONG AS THE CELL IS NOT EXPLORED, DO LEFT-WALL-FOLLOWER
-                                while(exploreChecker.getIsExplored(robot.getPosX(), robot.getPosY()) != grid.getIsExplored(robot.getPosX(), robot.getPosY())){
-                                    if(grid.checkExploredPercentage() == 100){ // IF FULLEST EXPLORED, EXIT AND GO TO START
-                                        break;
-                                    }
-                                    leftWallFollower(robot, grid, realRun);
-                                    startPointFlag = false; // SETSTARTPOINT FLAG TO FALSE TO SAY THAT ROBOT IS NOT AT START POINT.
-                                }
+                for (int x = MAP_COLS - 1; x >= 0; x--) {
+                    // CHECK FOR UNEXPLORED CELLS && CHECK IF NEIGHBOURS ARE REACHABLE OR NOT
+                    if (!grid.getIsExplored(x, y) &&
+                            ((checkUnexplored(robot, grid, x + 1, y, realRun)
+                                    || checkUnexplored(robot, grid, x - 1, y, realRun)
+                                    || checkUnexplored(robot, grid, x, y + 1, realRun)
+                                    || checkUnexplored(robot, grid, x, y - 1, realRun)))) {
+                        boolean startPointFlag = true;
+                        while (startPointFlag) { // SET STARTPOINTFLAG TO TRUE TO INITIATE LEFT-WALL-FOLLOWER
+                            leftWallFollower(robot, grid, realRun);
+                            // AS LONG AS THE CELL IS NOT EXPLORED, DO LEFT-WALL-FOLLOWER
+                            if (grid.checkExploredPercentage() == 100) { // IF FULLEST EXPLORED, EXIT AND GO TO START
+                                break;
                             }
-                        }else if(checkUnexplored(robot, grid, x-1, y, realRun)){ // CHECK IF NEIGHBOURS ARE REACHABLE OR NOT
-                            boolean startPointFlag = true;
-                            while(startPointFlag){ // SET STARTPOINTFLAG TO TRUE TO INITIATE LEFT-WALL-FOLLOWER
-                                leftWallFollower(robot, grid, realRun);
-                                // AS LONG AS THE CELL IS NOT EXPLORED, DO LEFT-WALL-FOLLOWER
-                                while(exploreChecker.getIsExplored(robot.getPosX(), robot.getPosY()) != grid.getIsExplored(robot.getPosX(), robot.getPosY())){
-                                    if(grid.checkExploredPercentage() == 100){ // IF FULLEST EXPLORED, EXIT AND GO TO START
-                                        break;
-                                    }
-                                    leftWallFollower(robot, grid, realRun);
-                                    startPointFlag = false; // SETSTARTPOINT FLAG TO FALSE TO SAY THAT ROBOT IS NOT AT START POINT.
+                            while (exploreChecker.getIsExplored(robot.getPosX(), robot.getPosY()) != grid.getIsExplored(robot.getPosX(), robot.getPosY())) {
+                                startPointFlag = false; // SETSTARTPOINT FLAG TO FALSE TO SAY THAT ROBOT IS NOT AT START POINT.
+                                if (grid.checkExploredPercentage() == 100) { // IF FULLEST EXPLORED, EXIT AND GO TO START
+                                    break;
                                 }
-                            }
-                        }else if(checkUnexplored(robot, grid, x, y+1, realRun)){ // CHECK IF NEIGHBOURS ARE REACHABLE OR NOT
-                            boolean startPointFlag = true;
-                            while(startPointFlag){ // SET STARTPOINTFLAG TO TRUE TO INITIATE LEFT-WALL-FOLLOWER
                                 leftWallFollower(robot, grid, realRun);
-                                // AS LONG AS THE CELL IS NOT EXPLORED, DO LEFT-WALL-FOLLOWER
-                                while(exploreChecker.getIsExplored(robot.getPosX(), robot.getPosY()) != grid.getIsExplored(robot.getPosX(), robot.getPosY())){
-                                    if(grid.checkExploredPercentage() == 100){ // IF FULLEST EXPLORED, EXIT AND GO TO START
-                                        break;
-                                    }
-                                    leftWallFollower(robot, grid, realRun);
-                                    startPointFlag = false; // SETSTARTPOINT FLAG TO FALSE TO SAY THAT ROBOT IS NOT AT START POINT.
-                                }
-                            }
-                        }else if(checkUnexplored(robot, grid, x, y-1, realRun)){ // CHECK IF NEIGHBOURS ARE REACHABLE OR NOT
-                            boolean startPointFlag = true;
-                            while(startPointFlag){ // SET STARTPOINTFLAG TO TRUE TO INITIATE LEFT-WALL-FOLLOWER
-                                leftWallFollower(robot, grid, realRun);
-                                // AS LONG AS THE CELL IS NOT EXPLORED, DO LEFT-WALL-FOLLOWER
-                                while(exploreChecker.getIsExplored(robot.getPosX(), robot.getPosY()) != grid.getIsExplored(robot.getPosX(), robot.getPosY())){
-                                    if(grid.checkExploredPercentage() == 100){ // IF FULLEST EXPLORED, EXIT AND GO TO START
-                                        break;
-                                    }
-                                    leftWallFollower(robot, grid, realRun);
-                                    startPointFlag = false; // SET STARTPOINTFLAG TO FALSE TO SAY THAT ROBOT IS NOT AT START POINT.
-                                }
                             }
                         }
                     }
                 }
             }
-        }
+            /*
+            FASTEST PATH BACK TO START ONCE THE EXPLORATION IS COMPLETED.
+            */
+            if(!Grid.isInStartZone(robot.getPosX()+2, robot.getPosY()+2)){
+                Robot fakeRobot = new Robot(grid, new ArrayList<>());
+                fakeRobot.setPosX(robot.getPosX());
+                fakeRobot.setPosY(robot.getPosY());
+                fakeRobot.setHeading(robot.getHeading());
+                List<String> returnPath = AlgorithmRunner.runAstar(robot.getPosX(), robot.getPosY(), START_X, START_Y, grid, fakeRobot);
 
-        /*
-        FASTEST PATH BACK TO START ONCE THE EXPLORATION IS COMPLETED.
-        */
-        Robot fakeRobot = new Robot(grid, new ArrayList<>());
-        fakeRobot.setPosX(robot.getPosX());
-        fakeRobot.setPosY(robot.getPosY());
-        fakeRobot.setHeading(robot.getHeading());
-        List<String> returnPath = AlgorithmRunner.runAstar(robot.getPosX(), robot.getPosY(), START_X, START_Y, grid, fakeRobot);
+                if (returnPath != null) {
+                    System.out.println("RUNNING A* SEARCHHHHHHH!");
+                    System.out.println(returnPath.toString());
 
-        if (returnPath != null) {
-            System.out.println("RUNNING A* SEARCH!");
-            System.out.println(returnPath.toString());
-
-            for (String action : returnPath) {
-                robot.sense(realRun);
-                if (realRun)
-                    SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
-                            MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
-                                    robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
-                if(!realRun)
-                    stepTaken();
-                if (action.equals("M")) {
-                    if (realRun)
-                        SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "M1");
-                    robot.move();
-                } else if (action.equals("L")) {
-                    if (realRun)
-                        SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
-                    robot.turn(LEFT);
-                } else if (action.equals("R")) {
-                    if (realRun)
-                        SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
-                    robot.turn(RIGHT);
-                } else if (action.equals("U")) {
-                    if (realRun)
-                        SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "U");
-                    robot.turn(LEFT);
-                    robot.turn(LEFT);
+                    for (String action : returnPath) {
+                        robot.sense(realRun);
+                        if (realRun)
+                            SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
+                                    MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
+                                            robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
+                        if(!realRun)
+                            stepTaken();
+                        if (action.equals("M")) {
+                            if (realRun)
+                                SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "M1");
+                            robot.move();
+                        } else if (action.equals("L")) {
+                            if (realRun)
+                                SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
+                            robot.turn(LEFT);
+                        } else if (action.equals("R")) {
+                            if (realRun)
+                                SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+                            robot.turn(RIGHT);
+                        } else if (action.equals("U")) {
+                            if (realRun)
+                                SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "U");
+                            robot.turn(LEFT);
+                            robot.turn(LEFT);
+                        }
+                    }
+                }else {
+                    System.out.println("FASTEST PATH NOT FOUND!!");
                 }
             }
-        }else {
-            System.out.println("FASTEST PATH NOT FOUND!!");
         }
 
         System.out.println("EXPLORATION COMPLETED!");
