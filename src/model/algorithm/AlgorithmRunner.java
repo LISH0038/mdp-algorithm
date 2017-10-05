@@ -63,7 +63,6 @@ public interface AlgorithmRunner {
         while (!openSet.isEmpty()) {
             Cell current = getCurrent(openSet, fScore);
             if (current.getX() == endX && current.getY() == endY) {
-                System.out.println("Reached goal");
                 return reconstructPath(robot, current, cameFrom);
             }
 
@@ -89,8 +88,6 @@ public interface AlgorithmRunner {
                 fScore[neighbor.getX()][neighbor.getY()] = tentativeGScore + estimateDistanceToGoal(neighbor.getX(), neighbor.getY(), endX, endY);
             }
         }
-
-        System.out.println("No fastest path found.");
         return null;
     }
 

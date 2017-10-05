@@ -35,6 +35,7 @@ public class SocketMgr {
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Socket connection failed");
+
         }
     }
 
