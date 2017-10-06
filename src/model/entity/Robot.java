@@ -12,8 +12,8 @@ import static constant.RobotConstants.*;
  * Represents the physical robot
  */
 public class Robot extends Observable {
-    private int mPosX = START_POS_X;
-    private int mPosY = START_POS_Y;
+    private int mPosX = START_POS_X; // upper left of robot
+    private int mPosY = START_POS_Y; // upper left of robot
     private int mHeading = NORTH;
     private Grid mGrid;
     private List<Sensor> mSensors;
@@ -61,6 +61,70 @@ public class Robot extends Observable {
 
     public void setHeading(int heading) {
         mHeading = heading;
+    }
+
+    /**
+     * Test if the robot can calibrate on the left
+     * @return
+     */
+    public boolean canCalibrateLeft() {
+        for (int i = 0; i < ROBOT_SIZE; i++) {
+            if (i == 1) continue;
+            if (mHeading == NORTH) {
+                // DIRECTLY BESIDE OF ROBOT
+                if (!mGrid.getIsObstacle(mPosX - 1, mPosY + i)) {
+                    return false;
+                }
+            } else if (mHeading == SOUTH) {
+                // DIRECTLY BESIDE OF ROBOT
+                if (!mGrid.getIsObstacle(mPosX + 3, mPosY + i)) {
+                    return false;
+                }
+            } else if (mHeading == EAST) {
+                // DIRECTLY BESIDE OF ROBOT
+                if (!mGrid.getIsObstacle(mPosX + i, mPosY - 1)) {
+                    return false;
+                }
+            } else if (mHeading == WEST) {
+                // DIRECTLY BESIDE OF ROBOT
+                if (!mGrid.getIsObstacle(mPosX + i, mPosY + 3)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Test if the robot can calibrate in front
+     * @return
+     */
+    public boolean canCalibrateFront() {
+        for (int i = 0; i < ROBOT_SIZE; i++) {
+            if (i == 1) continue;
+            if (mHeading == NORTH) {
+                // DIRECTLY IN FRONT OF ROBOT
+                if (!mGrid.getIsObstacle(mPosX + i, mPosY - 1)) {
+                    return false;
+                }
+            } else if (mHeading == SOUTH) {
+                // DIRECTLY IN FRONT OF ROBOT
+                if (!mGrid.getIsObstacle(mPosX + i, mPosY + 3)) {
+                    return false;
+                }
+            } else if (mHeading == EAST) {
+                // DIRECTLY IN FRONT OF ROBOT
+                if (!mGrid.getIsObstacle(mPosX + 3, mPosY + i)) {
+                    return false;
+                }
+            } else if (mHeading == WEST) {
+                // DIRECTLY IN FRONT OF ROBOT
+                if (!mGrid.getIsObstacle(mPosX - 1, mPosY + i)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public boolean isObstacleAhead() {
@@ -144,16 +208,35 @@ public class Robot extends Observable {
         return false;
     }
 
+    /**
+     * Move robot towards the front, set robot's location to "not obstacle" and "explored"
+     */
     public void move() {
         // TODO: make sure it won't go beyond the arena
         if (mHeading == NORTH) { // Limit position to prevent wall crash
-                mPosY--;
+            mPosY--;
+            for (int i = 0; i < 3; ++i) {
+                mGrid.setIsObstacle(mPosX + i, mPosY, false);
+                mGrid.setExplored(mPosX + i, mPosY, true);
+            }
         } else if (mHeading == SOUTH) {// Limit position to prevent wall crash
-                mPosY++;
+            mPosY++;
+            for (int i = 0; i < 3; ++i) {
+                mGrid.setIsObstacle(mPosX + i, mPosY + 2, false);
+                mGrid.setExplored(mPosX + i, mPosY + 2, true);
+            }
         } else if (mHeading == WEST) { // Limit position to prevent wall crash
-                mPosX--;
+            mPosX--;
+            for (int i = 0; i < 3; ++i) {
+                mGrid.setIsObstacle(mPosX, mPosY + i, false);
+                mGrid.setExplored(mPosX, mPosY + i, true);
+            }
         } else if (mHeading == EAST) { // Limit position to prevent wall crash
-                mPosX++;
+            mPosX++;
+            for (int i = 0; i < 3; ++i) {
+                mGrid.setIsObstacle(mPosX + 2, mPosY + i, false);
+                mGrid.setExplored(mPosX + 2, mPosY + i, true);
+            }
         }
         setChanged();
         notifyObservers();
@@ -204,7 +287,7 @@ public class Robot extends Observable {
      * @param x
      * @param y
      */
-    private void updateMap(int returnedDistance, int heading, int range, int x, int y) {
+    private void updateMap(int returnedDistance, int heading, int range, int x, int y, boolean realRun, int reliability) {
         int xToUpdate = x, yToUpdate = y;
         int distance = Math.min(returnedDistance, range);
         boolean obstacleAhead = returnedDistance <= range;
@@ -220,10 +303,19 @@ public class Robot extends Observable {
                 xToUpdate = xToUpdate + 1;
             }
             mGrid.setExplored(xToUpdate, yToUpdate, true);
+            // if this cell is an obstacle
             if (i == distance && obstacleAhead) {
-                mGrid.setIsObstacle(xToUpdate, yToUpdate, true);
-            } else {
-                mGrid.setIsObstacle(xToUpdate, yToUpdate, false);
+                if (realRun) {
+                    mGrid.setObstacleProbability(xToUpdate, yToUpdate, reliability); // increment by reliability
+                } else {
+                    mGrid.setIsObstacle(xToUpdate, yToUpdate, true);
+                }
+            } else { // if this cell is not an obstacle
+                if (realRun) {
+                    mGrid.setObstacleProbability(xToUpdate, yToUpdate, -reliability); // decrement by reliability
+                } else {
+                    mGrid.setIsObstacle(xToUpdate, yToUpdate, false);
+                }
             }
         }
     }
@@ -234,6 +326,7 @@ public class Robot extends Observable {
      */
     public void sense(boolean realRun) {
         if (realRun) {
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "S");
             String sensorData = SocketMgr.getInstance().receiveMessage();
             String[] sensorReadings = sensorData.split(",", mSensors.size());
             for (int i = 0; i < mSensors.size(); i++) {
@@ -242,7 +335,7 @@ public class Robot extends Observable {
                 int range = mSensors.get(i).getRange();
                 int x = mSensors.get(i).getActualPosX();
                 int y = mSensors.get(i).getActualPosY();
-                updateMap(returnedDistance, heading, range, x, y);
+                updateMap(returnedDistance, heading, range, x, y, true, mSensors.get(i).getReliability());
             }
         } else {
             for (Sensor sensor : mSensors) {
@@ -251,7 +344,7 @@ public class Robot extends Observable {
                 int range = sensor.getRange();
                 int x = sensor.getActualPosX();
                 int y = sensor.getActualPosY();
-                updateMap(returnedDistance, heading, range, x, y);
+                updateMap(returnedDistance, heading, range, x, y, false, sensor.getReliability());
             }
         }
     }

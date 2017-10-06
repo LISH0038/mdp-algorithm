@@ -11,13 +11,15 @@ public class Sensor {
     private int mPosX;
     private int mPosY;
     private int mDirection;
+    private int mReliability;
     private Robot mRobot;
 
-    public Sensor(int range, int posX, int posY, int direction) {
+    public Sensor(int range, int posX, int posY, int direction, int reliability) {
         mRange = range;
         mPosX = posX;
         mPosY = posY;
         mDirection = direction;
+        mReliability = reliability;
     }
 
     /**
@@ -124,6 +126,10 @@ public class Sensor {
         if (mRobot.getHeading() == SOUTH || mRobot.getHeading() == WEST)
             return mRobot.getPosY() + 2;
         return mRobot.getPosY();
+    }
+
+    public int getReliability() {
+        return mReliability;
     }
 
     int getRange() {

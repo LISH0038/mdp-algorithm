@@ -11,12 +11,23 @@ public class Cell implements Comparable<Cell> {
     private int mDistance;
     private boolean mExplored = false;
     private boolean mIsObstacle = false;
+    private int counter = 0;
 
     Cell() {}
 
     public Cell(int x, int y) {
         mX = x;
         mY = y;
+    }
+
+    // set whether a cell is an obstacle according to an counter
+    void updateCounter(int value) {
+        counter += value;
+        if (counter > 0) {
+            mIsObstacle = true;
+        } else {
+            mIsObstacle = false;
+        }
     }
 
     void setExplored(boolean explored) {
