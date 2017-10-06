@@ -50,18 +50,39 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         boolean endZoneFlag = false;
         boolean startZoneFlag = false;
 
+        // MAIN LOOP (LEFT-WALL-FOLLOWER)
+        // TODO: make it inside if (realRun)
+        int calibrationCounter = 0;
+        if (realRun) {
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+        }
         // FIRST SENSE
-        if (realRun)
-            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "S");
         robot.sense(realRun);
         if (realRun)
             SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
                     MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
                             robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
 
-        // MAIN LOOP (LEFT-WALL-FOLLOWER)
         while (!endZoneFlag || !startZoneFlag) {
             leftWallFollower(robot, grid, realRun);
+
+            // CALIBRATION
+            if (realRun) {
+                calibrationCounter++;
+                if (robot.canCalibrateFront()) {
+                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+                    calibrationCounter = 0;
+                } else if (calibrationCounter >= 5 && robot.canCalibrateLeft()) {
+                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
+                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+                    calibrationCounter = 0;
+                }
+            }
+
             if(Grid.isInEndZone(robot.getPosX(), robot.getPosY())){
                 endZoneFlag = true;
             }
@@ -105,7 +126,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                             SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
                                     MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
                                             robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
-                        if(!realRun)
+                        //if(!realRun)
                             stepTaken();
                     }
                 }else {
@@ -213,16 +234,15 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                 if (realRun)
                     SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "U");
                 robot.turn(RIGHT);
-                //stepTaken();
                 robot.turn(RIGHT);
-                if (!realRun)
+                //if (!realRun)
                     stepTaken();
             } else if (robot.isObstacleLeft()) {
                 System.out.println("OBSTACLE DETECTED! (FRONT + LEFT) TURNING RIGHT");
                 if (realRun)
                     SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
                 robot.turn(RIGHT);
-                if (!realRun)
+                //if (!realRun)
                     stepTaken();
 
             } else {
@@ -230,7 +250,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                 if (realRun)
                     SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
                 robot.turn(LEFT);
-                if (!realRun)
+                //if (!realRun)
                     stepTaken();
             }
             // sense here
@@ -245,7 +265,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
             if (realRun)
                 SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
             robot.turn(LEFT);
-            if (!realRun)
+            //if (!realRun)
                 stepTaken();
             // sense here
             robot.sense(realRun);
@@ -260,7 +280,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         robot.move();
         // sense here
         robot.sense(realRun);
-        if (!realRun)
+        //if (!realRun)
             stepTaken();
         if (realRun) {
             SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
@@ -285,7 +305,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                     SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
                             MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
                                     robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
-                if (!realRun)
+                //if (!realRun)
                     stepTaken();
                 if (action.equals("M")) {
                     if (realRun)

@@ -54,6 +54,12 @@ public class Grid extends Observable {
         notifyObservers();
     }
 
+    public void setObstacleProbability(int x, int y, int value) {
+        if (isOutOfArena(x, y))
+            return;
+        cells[x][y].updateCounter(value);
+    }
+
     public void setExplored(int x, int y, boolean explored) {
         if (isOutOfArena(x, y))
             return;
@@ -66,7 +72,7 @@ public class Grid extends Observable {
         return !isOutOfArena(x, y) && cells[x][y].getExplored();
     }
 
-    public int checkExploredPercentage() {
+    public double checkExploredPercentage() {
         double totalCells = 0.0;
         double cellsExplored = 0.0;
         for (int x = 0; x < MAP_COLS; x++) {
@@ -77,7 +83,7 @@ public class Grid extends Observable {
                 totalCells += 1;
             }
         }
-        return (int) Math.round((cellsExplored / totalCells) * 100);
+        return (cellsExplored / totalCells) * 100;
     }
 
     public void loadFromDisk(String path) throws IOException {
