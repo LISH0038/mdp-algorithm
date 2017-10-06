@@ -129,7 +129,20 @@ public interface AlgorithmRunner {
 
         // convert path to robot movement
         List<String> actions = new ArrayList<>();
+        int calibrationCounter = 0;
         for (Cell cell : path) {
+
+            calibrationCounter++;
+            if (robot.canCalibrateFront()) {
+                actions.add("C");
+                calibrationCounter = 0;
+            } else if (calibrationCounter >= 5 && robot.canCalibrateLeft()) {
+                actions.add("L");
+                actions.add("C");
+                actions.add("R");
+                calibrationCounter = 0;
+            }
+
             // see if we need to turn
             int nextHeading = 0;
             if (robot.getCenterPosX() < cell.getX() + 1)
@@ -228,5 +241,36 @@ public interface AlgorithmRunner {
             distance += 1;
 
         return distance;
+    }
+
+    /**
+     * Convert the list of actions into a single string for sending
+     * to Arduino. Specifically, consecutive moves are compressed to the
+     * format "M5" to represent moving 5 cells at once.
+     * @param actions Actions to perform
+     * @return A string representing the actions
+     */
+    static String compressPath(List<String> actions) {
+        int moveCounter = 0;
+        StringBuilder builder = new StringBuilder();
+
+        for (String action : actions) {
+            if (action.equals("L") || action.equals("R") || action.equals("U")) {
+                if (moveCounter != 0) {
+                    builder.append("M");
+                    builder.append(moveCounter);
+                    moveCounter = 0;
+                }
+                builder.append(action);
+            } else if (action.equals("M")) {
+                moveCounter++;
+            }
+        }
+        if (moveCounter != 0) {
+            builder.append("M");
+            builder.append(moveCounter);
+        }
+
+        return builder.toString();
     }
 }

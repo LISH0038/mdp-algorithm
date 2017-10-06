@@ -53,17 +53,38 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
 
         // run from start to waypoint and from waypoint to goal
         System.out.println("Fastest path algorithm started with waypoint " + wayPointX + "," + wayPointY);
-        Robot fakeRobot = new Robot(null, new ArrayList<>());
+        Robot fakeRobot = new Robot(new Grid(), new ArrayList<>());
         List<String> path1 = AlgorithmRunner.runAstar(START_X, START_Y, wayPointX, wayPointY, grid, fakeRobot);
         List<String> path2 = AlgorithmRunner.runAstar(wayPointX, wayPointY, GOAL_X, GOAL_Y, grid, fakeRobot);
+
+        // CALIBRATION
+        if (realRun) {
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+        }
 
         if (path1 != null && path2 != null) {
             System.out.println("Algorithm finished, executing actions");
             path1.addAll(path2);
             System.out.println(path1.toString());
             if (realRun) {
-                String compressedPath = compressPath(path1);
+                String compressedPath = AlgorithmRunner.compressPath(path1);
                 SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, compressedPath);
+                for (String action : path1) {
+                    if (action.equals("M")) {
+                        robot.move();
+                    } else if (action.equals("L")) {
+                        robot.turn(LEFT);
+                    } else if (action.equals("R")) {
+                        robot.turn(RIGHT);
+                    } else if (action.equals("U")) {
+                        robot.turn(LEFT);
+                        robot.turn(LEFT);
+                    }
+                    takeStep();
+                }
             } else {
                 for (String action : path1) {
                     if (action.equals("M")) {
@@ -82,37 +103,6 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         } else {
             System.out.println("Fastest path not found!");
         }
-    }
-
-    /**
-     * Convert the list of actions into a single string for sending
-     * to Arduino. Specifically, consecutive moves are compressed to the
-     * format "M5" to represent moving 5 cells at once.
-     * @param actions Actions to perform
-     * @return A string representing the actions
-     */
-    private String compressPath(List<String> actions) {
-        int moveCounter = 0;
-        StringBuilder builder = new StringBuilder();
-
-        for (String action : actions) {
-            if (action.equals("L") || action.equals("R") || action.equals("U")) {
-                if (moveCounter != 0) {
-                    builder.append("M");
-                    builder.append(moveCounter);
-                    moveCounter = 0;
-                }
-                builder.append(action);
-            } else if (action.equals("M")) {
-                moveCounter++;
-            }
-        }
-        if (moveCounter != 0) {
-            builder.append("M");
-            builder.append(moveCounter);
-        }
-
-        return builder.toString();
     }
 
     /**

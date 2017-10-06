@@ -23,11 +23,7 @@ public class Cell implements Comparable<Cell> {
     // set whether a cell is an obstacle according to an counter
     void updateCounter(int value) {
         counter += value;
-        if (counter > 0) {
-            mIsObstacle = true;
-        } else {
-            mIsObstacle = false;
-        }
+        mIsObstacle = counter > 0;
     }
 
     void setExplored(boolean explored) {
