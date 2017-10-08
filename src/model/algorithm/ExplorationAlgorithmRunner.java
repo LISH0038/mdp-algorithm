@@ -35,15 +35,61 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         robot.reset();
         if (realRun) {
             grid.clearObstacles();
-            //SocketMgr.getInstance().clearInputBuffer();
-            //System.out.println("Wait for startup message");
             String msg = SocketMgr.getInstance().receiveMessage();
             while (!msg.equals("exs")) {
                 msg = SocketMgr.getInstance().receiveMessage();
             }
         }
-        runExplorationAlgorithmThorough(grid, robot, realRun);
+        // SELECT EITHER ONE OF THE METHODS TO RUN ALGORITHMS.
+        //runExplorationAlgorithmThorough(grid, robot, realRun);
+        runExplorationLeftWall(grid, robot, realRun);
         grid.generateDescriptor();
+    }
+
+    private void runExplorationLeftWall(Grid grid, Robot robot, boolean realRun){
+        boolean endZoneFlag = false;
+        boolean startZoneFlag = false;
+
+        // MAIN LOOP (LEFT-WALL-FOLLOWER)
+        // TODO: make it inside if (realRun)
+        int calibrationCounter = 0;
+        if (realRun) {
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+        }
+        // FIRST SENSE
+        robot.sense(realRun);
+        if (realRun)
+            SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
+                    MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
+                            robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
+
+        while (!endZoneFlag || !startZoneFlag) {
+            leftWallFollower(robot, grid, realRun);
+
+            // CALIBRATION
+            if (realRun) {
+                calibrationCounter++;
+                if (robot.canCalibrateFront()) {
+                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+                    calibrationCounter = 0;
+                } else if (calibrationCounter >= 5 && robot.canCalibrateLeft()) {
+                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
+                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+                    calibrationCounter = 0;
+                }
+            }
+
+            if (Grid.isInEndZone(robot.getPosX(), robot.getPosY())) {
+                endZoneFlag = true;
+            }
+            if (endZoneFlag && Grid.isInStartZone(robot.getPosX() + 2, robot.getPosY())) {
+                startZoneFlag = true;
+            }
+        }
     }
 
     private void runExplorationAlgorithmThorough(Grid grid, Robot robot, boolean realRun) {
@@ -335,6 +381,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
             return false;
         }
     }
+
     private void stepTaken(){
         /*
             MAKE IT MOVE SLOWLY SO CAN SEE STEP BY STEP MOVEMENT
