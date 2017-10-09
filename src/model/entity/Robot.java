@@ -216,25 +216,25 @@ public class Robot extends Observable {
         if (mHeading == NORTH) { // Limit position to prevent wall crash
             mPosY--;
             for (int i = 0; i < 3; ++i) {
-                mGrid.setIsObstacle(mPosX + i, mPosY, false);
+                mGrid.setObstacleProbability(mPosX + i, mPosY, -1000);
                 mGrid.setExplored(mPosX + i, mPosY, true);
             }
         } else if (mHeading == SOUTH) {// Limit position to prevent wall crash
             mPosY++;
             for (int i = 0; i < 3; ++i) {
-                mGrid.setIsObstacle(mPosX + i, mPosY + 2, false);
+                mGrid.setObstacleProbability(mPosX + i, mPosY + 2, -1000);
                 mGrid.setExplored(mPosX + i, mPosY + 2, true);
             }
         } else if (mHeading == WEST) { // Limit position to prevent wall crash
             mPosX--;
             for (int i = 0; i < 3; ++i) {
-                mGrid.setIsObstacle(mPosX, mPosY + i, false);
+                mGrid.setObstacleProbability(mPosX, mPosY + i, -1000);
                 mGrid.setExplored(mPosX, mPosY + i, true);
             }
         } else if (mHeading == EAST) { // Limit position to prevent wall crash
             mPosX++;
             for (int i = 0; i < 3; ++i) {
-                mGrid.setIsObstacle(mPosX + 2, mPosY + i, false);
+                mGrid.setObstacleProbability(mPosX + 2, mPosY + i, -1000);
                 mGrid.setExplored(mPosX + 2, mPosY + i, true);
             }
         }
