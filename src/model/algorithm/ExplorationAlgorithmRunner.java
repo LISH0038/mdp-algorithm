@@ -13,9 +13,7 @@ import static constant.CommConstants.TARGET_ANDROID;
 import static constant.CommConstants.TARGET_ARDUINO;
 import static constant.MapConstants.MAP_COLS;
 import static constant.MapConstants.MAP_ROWS;
-import static constant.RobotConstants.LEFT;
-import static constant.RobotConstants.RIGHT;
-import static constant.RobotConstants.SOUTH;
+import static constant.RobotConstants.*;
 
 /**
  * Algorithm for exploration phase (full exploration)
@@ -44,7 +42,23 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         // SELECT EITHER ONE OF THE METHODS TO RUN ALGORITHMS.
         //runExplorationAlgorithmThorough(grid, robot, realRun);
         runExplorationLeftWall(grid, robot, realRun);
+        calibrateAndTurn(robot, realRun);
         grid.generateDescriptor();
+    }
+
+    private void calibrateAndTurn(Robot robot, boolean realRun) {
+        if (realRun) {
+            while (robot.getHeading() != SOUTH) {
+                robot.turn(LEFT);
+            }
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+        }
+        while (robot.getHeading() != NORTH) {
+            robot.turn(RIGHT);
+        }
     }
 
     private void runExplorationLeftWall(Grid grid, Robot robot, boolean realRun){
