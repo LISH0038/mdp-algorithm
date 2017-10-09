@@ -69,8 +69,8 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
             // CHECK IF TURNING IS NECESSARY
             boolean turned = leftWallFollower(robot, grid, realRun);
 
-            // CALIBRATION
             if (turned) {
+                // CALIBRATION
                 if (realRun) {
                     calibrationCounter++;
                     // IF CAN CALIBRATE FRONT, TAKE THE OPPORTUNITY
@@ -85,10 +85,10 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                         calibrationCounter = 0;
                     }
                 }
-            }
 
-            // SENSE AFTER CALIBRATION
-            senseAndUpdateAndroid(robot, grid, realRun);
+                // SENSE AFTER CALIBRATION
+                senseAndUpdateAndroid(robot, grid, realRun);
+            }
 
             // MOVE FORWARD
             if (realRun)
