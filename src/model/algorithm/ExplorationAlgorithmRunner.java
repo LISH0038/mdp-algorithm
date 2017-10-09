@@ -94,6 +94,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
             if (realRun)
                 SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "M1");
             robot.move();
+            stepTaken();
 
             // CALIBRATION
             if (realRun) {
@@ -421,7 +422,6 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
 
     private void senseAndUpdateAndroid(Robot robot, Grid grid, boolean realRun) {
         robot.sense(realRun);
-        stepTaken();
         if (realRun) {
             SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
                     MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
