@@ -25,6 +25,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
     private int sleepDuration;
     private static final int START_X = 0;
     private static final int START_Y = 17;
+    private static final int CALIBRATION_LIMIT = 5;
     public ExplorationAlgorithmRunner(int speed){
         sleepDuration = 1000 / speed;
     }
@@ -77,7 +78,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                     if (robot.canCalibrateFront()) {
                         SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
                         calibrationCounter = 0;
-                    } else if (calibrationCounter >= 5 && robot.canCalibrateLeft()) {
+                    } else if (calibrationCounter >= CALIBRATION_LIMIT && robot.canCalibrateLeft()) {
                         SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
                         SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
                         SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
@@ -102,7 +103,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                 if (robot.canCalibrateFront()) {
                     SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
                     calibrationCounter = 0;
-                } else if (calibrationCounter >= 5 && robot.canCalibrateLeft()) {
+                } else if (calibrationCounter >= CALIBRATION_LIMIT && robot.canCalibrateLeft()) {
                     SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
                     SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
                     SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
@@ -152,7 +153,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                 if (robot.canCalibrateFront()) {
                     SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
                     calibrationCounter = 0;
-                } else if (calibrationCounter >= 5 && robot.canCalibrateLeft()) {
+                } else if (calibrationCounter >= CALIBRATION_LIMIT && robot.canCalibrateLeft()) {
                     SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
                     SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
                     SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");

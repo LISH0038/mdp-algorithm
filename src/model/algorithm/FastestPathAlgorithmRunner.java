@@ -57,21 +57,22 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         List<String> path1 = AlgorithmRunner.runAstar(START_X, START_Y, wayPointX, wayPointY, grid, fakeRobot);
         List<String> path2 = AlgorithmRunner.runAstar(wayPointX, wayPointY, GOAL_X, GOAL_Y, grid, fakeRobot);
 
-        // CALIBRATION
-        if (realRun) {
-            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
-            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
-            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
-            SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
-        }
-
         if (path1 != null && path2 != null) {
             System.out.println("Algorithm finished, executing actions");
             path1.addAll(path2);
             System.out.println(path1.toString());
             if (realRun) {
+                // INITIAL CALIBRATION
+                if (realRun) {
+                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+                }
+                // SEND ENTIRE PATH AT ONCE
                 String compressedPath = AlgorithmRunner.compressPath(path1);
                 SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, compressedPath);
+                // SIMULATE AT THE SAME TIME
                 for (String action : path1) {
                     if (action.equals("M")) {
                         robot.move();
