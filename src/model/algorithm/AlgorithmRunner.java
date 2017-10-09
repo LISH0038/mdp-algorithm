@@ -132,16 +132,16 @@ public interface AlgorithmRunner {
         int calibrationCounter = 0;
         for (Cell cell : path) {
 
-            calibrationCounter++;
-            if (robot.canCalibrateFront()) {
-                actions.add("C");
-                calibrationCounter = 0;
-            } else if (calibrationCounter >= 5 && robot.canCalibrateLeft()) {
-                actions.add("L");
-                actions.add("C");
-                actions.add("R");
-                calibrationCounter = 0;
-            }
+            //calibrationCounter++;
+            //if (robot.canCalibrateFront()) {
+            //    actions.add("C");
+            //    calibrationCounter = 0;
+            //} else if (calibrationCounter >= 5 && robot.canCalibrateLeft()) {
+            //    actions.add("L");
+            //    actions.add("C");
+            //    actions.add("R");
+            //    calibrationCounter = 0;
+            //}
 
             // see if we need to turn
             int nextHeading = 0;
