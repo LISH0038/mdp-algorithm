@@ -1,9 +1,8 @@
 package model.algorithm;
 
-import model.entity.Cell;
 import model.entity.Grid;
 import model.entity.Robot;
-import model.util.MessageGenerator;
+import model.util.MessageMgr;
 import model.util.SocketMgr;
 
 import java.util.ArrayList;
@@ -42,8 +41,16 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         // SELECT EITHER ONE OF THE METHODS TO RUN ALGORITHMS.
         //runExplorationAlgorithmThorough(grid, robot, realRun);
         runExplorationLeftWall(grid, robot, realRun);
+
+        // CALIBRATION AFTER EXPLORATION
         calibrateAndTurn(robot, realRun);
-        grid.generateDescriptor();
+
+        // GENERATE MAP DESCRIPTOR, SEND TO ANDROID
+        String part1 = grid.generateDescriptorPartOne();
+        String part2 = grid.generateDescriptorPartTwo();
+        if (realRun) {
+            SocketMgr.getInstance().sendMessage(TARGET_ANDROID, MessageMgr.generateFinalDescriptor(part1, part2));
+        }
     }
 
     private void calibrateAndTurn(Robot robot, boolean realRun) {
@@ -75,7 +82,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         // INITIAL UPDATE OF MAP TO ANDROID
         if (realRun)
             SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
-                    MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
+                    MessageMgr.generateMapDescriptorMsg(grid.generateForAndroid(),
                             robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
 
         // MAIN LOOP (LEFT-WALL-FOLLOWER)
@@ -156,7 +163,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         robot.sense(realRun);
         if (realRun)
             SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
-                    MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
+                    MessageMgr.generateMapDescriptorMsg(grid.generateForAndroid(),
                             robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
 
         while (!endZoneFlag || !startZoneFlag) {
@@ -217,7 +224,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                         robot.sense(realRun);
                         if (realRun)
                             SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
-                                    MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
+                                    MessageMgr.generateMapDescriptorMsg(grid.generateForAndroid(),
                                             robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
                         //if(!realRun)
                         stepTaken();
@@ -291,7 +298,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                             robot.sense(realRun);
                             if (realRun)
                                 SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
-                                        MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
+                                        MessageMgr.generateMapDescriptorMsg(grid.generateForAndroid(),
                                                 robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
                             if(!realRun)
                                 stepTaken();
@@ -387,7 +394,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                 robot.sense(realRun);
                 if (realRun)
                     SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
-                            MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
+                            MessageMgr.generateMapDescriptorMsg(grid.generateForAndroid(),
                                     robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
                 //if (!realRun)
                 stepTaken();
@@ -438,7 +445,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         robot.sense(realRun);
         if (realRun) {
             SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
-                    MessageGenerator.generateMapDescriptorMsg(grid.generateForAndroid(),
+                    MessageMgr.generateMapDescriptorMsg(grid.generateForAndroid(),
                             robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
         }
     }

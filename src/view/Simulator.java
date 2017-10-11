@@ -22,6 +22,7 @@ public class Simulator extends JFrame {
     private JButton mLoadMapButton;
     private JButton mTimeLimitedButton;
     private JButton mCoverageLimitedButton;
+    private JButton mRealRunButton;
     private JCheckBox mRealRunCheckBox;
     private JFormattedTextField mRobotSpeedField;
 
@@ -43,6 +44,7 @@ public class Simulator extends JFrame {
         mLoadMapButton = new JButton("Load map");
         mTimeLimitedButton = new JButton("Time limited");
         mCoverageLimitedButton = new JButton("Coverage limited");
+        mRealRunButton = new JButton("Physical run");
         mRealRunCheckBox = new JCheckBox("Real run");
         mRealRunCheckBox.setHorizontalTextPosition(SwingConstants.LEFT);
         mRobotSpeedField = new JFormattedTextField(NumberFormat.getIntegerInstance());
@@ -62,6 +64,7 @@ public class Simulator extends JFrame {
         bottomPanel.add(mRealRunCheckBox);
         bottomPanel.add(new JLabel("Speed"));
         bottomPanel.add(mRobotSpeedField);
+        bottomPanel.add(mRealRunButton);
         bottomPanel.add(mExplorationButton);
         bottomPanel.add(mFastestPathButton);
         bottomPanel.add(mTimeLimitedButton);
@@ -101,6 +104,10 @@ public class Simulator extends JFrame {
         mRealRunCheckBox.addActionListener(actionListener);
     }
 
+    public void addRealRunButtonListener(ActionListener actionListener) {
+        mRealRunButton.addActionListener(actionListener);
+    }
+
     public void disableButtons() {
         mExplorationButton.setEnabled(false);
         mFastestPathButton.setEnabled(false);
@@ -123,6 +130,30 @@ public class Simulator extends JFrame {
 
     public void enableLoadMapButton() {
         mLoadMapButton.setEnabled(true);
+    }
+
+    public void disableRealRunButton() {
+        mRealRunButton.setEnabled(false);
+    }
+
+    public void enableRealRunButton() {
+        mRealRunButton.setEnabled(true);
+    }
+
+    public void disableFastestPathButton() {
+        mFastestPathButton.setEnabled(false);
+    }
+
+    public void enableFastestPathButton() {
+        mFastestPathButton.setEnabled(true);
+    }
+
+    public void disableExplorationButton() {
+        mExplorationButton.setEnabled(false);
+    }
+
+    public void enableExplorationButton() {
+        mExplorationButton.setEnabled(true);
     }
 
     public boolean getIsRealRun() {

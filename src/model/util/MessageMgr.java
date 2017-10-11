@@ -1,12 +1,19 @@
 package model.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static constant.MapConstants.MAP_ROWS;
 import static constant.RobotConstants.*;
 
 /**
  * Message generator
  */
-public class MessageGenerator {
+public class MessageMgr {
+
+    public static String generateFinalDescriptor(String part1, String part2) {
+        return "{\"finaldescriptor\" : \"" + part1 + "," + part2 + "\"}";
+    }
 
     /**
      * Generate map string for Android communication, note that on Android the coordinate of
@@ -37,5 +44,28 @@ public class MessageGenerator {
         }
         builder.append("\"}");
         return builder.toString();
+    }
+
+    /**
+     * Parse waypoint message from Android, the Y coordinate received
+     * starts from the bottom, so it's reversed.
+     * @param msg
+     * @return
+     */
+    public static List<Integer> parseMessage(String msg) {
+        String[] splitString = msg.split(",", 2);
+        List<Integer> waypoint = new ArrayList<>();
+
+        Integer wayPointX, wayPointY;
+        try {
+            wayPointX = Integer.parseInt(splitString[0]);
+            wayPointY = MAP_ROWS - Integer.parseInt(splitString[1]) - 1;
+            waypoint.add(wayPointX);
+            waypoint.add(wayPointY);
+            return waypoint;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

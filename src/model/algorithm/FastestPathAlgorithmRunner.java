@@ -2,6 +2,7 @@ package model.algorithm;
 
 import model.entity.Grid;
 import model.entity.Robot;
+import model.util.MessageMgr;
 import model.util.SocketMgr;
 
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ import static constant.RobotConstants.*;
 public class FastestPathAlgorithmRunner implements AlgorithmRunner {
 
     private int sleepDuration;
+    private int mWayPointX = -1;
+    private int mWayPointY = -1;
 
     private static final int START_X = 0;
     private static final int START_Y = 17;
@@ -27,25 +30,40 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
         sleepDuration = 1000 / speed;
     }
 
+    public FastestPathAlgorithmRunner(int speed, int x, int y) {
+        sleepDuration = 1000 / speed;
+        mWayPointX = x;
+        mWayPointY = y;
+    }
+
     @Override
     public void run(Grid grid, Robot robot, boolean realRun) {
         robot.reset();
 
-        // receive waypoint
-        int wayPointX, wayPointY;
+        // wait for start up message
         if (realRun) {
-            // receive from Android
-            System.out.println("Waiting for waypoint");
-            //SocketMgr.getInstance().clearInputBuffer();
             String msg = SocketMgr.getInstance().receiveMessage();
-            List<Integer> waypoints;
-            while ((waypoints = parseMessage(msg)) == null) {
+            while (!msg.equals("fps")) {
                 msg = SocketMgr.getInstance().receiveMessage();
             }
-            // the coordinates in fastest path search is different from real grid coordinate
-            wayPointX = waypoints.get(0)-1;
-            wayPointY = waypoints.get(1)-1;
-        } else {
+        }
+
+        // receive waypoint
+        int wayPointX = mWayPointX, wayPointY = mWayPointY;
+        //if (realRun && wayPointX == -1 && wayPointY == -1) {
+        //    // receive from Android
+        //    System.out.println("Waiting for waypoint");
+        //    //SocketMgr.getInstance().clearInputBuffer();
+        //    String msg = SocketMgr.getInstance().receiveMessage();
+        //    List<Integer> waypoints;
+        //    while ((waypoints = MessageMgr.parseMessage(msg)) == null) {
+        //        msg = SocketMgr.getInstance().receiveMessage();
+        //    }
+        //    // the coordinates in fastest path search is different from real grid coordinate
+        //    wayPointX = waypoints.get(0)-1;
+        //    wayPointY = waypoints.get(1)-1;
+        //} else if (!realRun) {
+        if (!realRun) {
             // ignore waypoint for simulation
             wayPointX = START_X;
             wayPointY = START_Y;
@@ -62,13 +80,13 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
             path1.addAll(path2);
             System.out.println(path1.toString());
             if (realRun) {
-                // INITIAL CALIBRATION
-                if (realRun) {
-                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
-                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
-                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
-                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
-                }
+                //// INITIAL CALIBRATION
+                //if (realRun) {
+                //    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+                //    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+                //    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+                //    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+                //}
                 // SEND ENTIRE PATH AT ONCE
                 String compressedPath = AlgorithmRunner.compressPath(path1);
                 SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, compressedPath);
@@ -103,29 +121,6 @@ public class FastestPathAlgorithmRunner implements AlgorithmRunner {
             }
         } else {
             System.out.println("Fastest path not found!");
-        }
-    }
-
-    /**
-     * Parse waypoint message from Android, the Y coordinate received
-     * starts from the bottom, so it's reversed.
-     * @param msg
-     * @return
-     */
-    private List<Integer> parseMessage(String msg) {
-        String[] splitString = msg.split(",", 2);
-        List<Integer> waypoint = new ArrayList<>();
-
-        Integer wayPointX, wayPointY;
-        try {
-            wayPointX = Integer.parseInt(splitString[0]);
-            wayPointY = MAP_ROWS - Integer.parseInt(splitString[1]) - 1;
-            waypoint.add(wayPointX);
-            waypoint.add(wayPointY);
-            return waypoint;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
     }
 

@@ -104,7 +104,7 @@ public class Grid extends Observable {
         }
     }
 
-    public void generateDescriptor() {
+    public String generateDescriptorPartOne() {
         StringBuilder builder;
 
         // first build string for exploration status
@@ -128,8 +128,12 @@ public class Grid extends Observable {
         System.out.println("Map descriptor part 1:");
         System.out.println(builder.toString());
 
+        return builder.toString();
+    }
+
+    public String generateDescriptorPartTwo() {
         // second build string for obstacle status
-        builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         for (int y = MAP_ROWS - 1; y >= 0; y--) {
             for (int x = 0; x < MAP_COLS; x++) {
                 if (getIsExplored(x, y)) {
@@ -151,6 +155,8 @@ public class Grid extends Observable {
         }
         System.out.println("Map descriptor part 2:");
         System.out.println(builder.toString());
+
+        return builder.toString();
     }
 
     public String generateForAndroid() {
