@@ -60,6 +60,7 @@ public class RealRunButtonListener implements ActionListener {
             // do fastest path
             AlgorithmRunner fastestPathRunner = new FastestPathAlgorithmRunner(mView.getRobotSpeed(),
                     waypoints.get(0) - 1, waypoints.get(1) - 1);
+            //0, 17);
             fastestPathRunner.run(mGrid, mRobot, mView.getIsRealRun());
 
             return 1;

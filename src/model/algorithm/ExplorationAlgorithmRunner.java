@@ -57,14 +57,16 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         if (realRun) {
             while (robot.getHeading() != SOUTH) {
                 robot.turn(LEFT);
+                SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
             }
             SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
             SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
             SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
             SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
-        }
-        while (robot.getHeading() != NORTH) {
-            robot.turn(RIGHT);
+            while (robot.getHeading() != NORTH) {
+                robot.turn(RIGHT);
+                SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+            }
         }
     }
 
@@ -96,7 +98,13 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                     calibrationCounter++;
                     // IF CAN CALIBRATE FRONT, TAKE THE OPPORTUNITY
                     // OTHERWISE CALIBRATE LEFT
-                    if (robot.canCalibrateFront()) {
+                    if (robot.canCalibrateFront() && robot.canCalibrateLeft()) {
+                        SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
+                        SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+                        SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
+                        SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
+                        calibrationCounter = 0;
+                    } else if (robot.canCalibrateFront()) {
                         SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "C");
                         calibrationCounter = 0;
                     } else if (calibrationCounter >= CALIBRATION_LIMIT && robot.canCalibrateLeft()) {
