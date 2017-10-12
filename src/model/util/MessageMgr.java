@@ -12,7 +12,7 @@ import static constant.RobotConstants.*;
 public class MessageMgr {
 
     public static String generateFinalDescriptor(String part1, String part2) {
-        return "{\"finaldescriptor\":\"" + part1 + "," + part2 + "\"}";
+        return "{finaldescriptor:\"" + part1 + "," + part2 + "\"}";
     }
 
     /**

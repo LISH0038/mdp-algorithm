@@ -52,45 +52,4 @@ public class AppRunner {
             System.out.println("Simulator started.");
         });
     }
-
-    private static void setObstaclesMap(Grid grid) {
-        grid.setIsObstacle(11, 19, true);
-        grid.setIsObstacle(11, 18, true);
-        grid.setIsObstacle(11, 17, true);
-
-        grid.setIsObstacle(8, 16, true);
-        grid.setIsObstacle(9, 16, true);
-        grid.setIsObstacle(10, 16, true);
-
-        grid.setIsObstacle(0, 13, true);
-        grid.setIsObstacle(1, 13, true);
-        grid.setIsObstacle(2, 13, true);
-        grid.setIsObstacle(2, 12, true);
-
-        grid.setIsObstacle(0, 7, true);
-        grid.setIsObstacle(1, 7, true);
-        grid.setIsObstacle(2, 7, true);
-        grid.setIsObstacle(2, 6, true);
-
-        grid.setIsObstacle(3, 0, true);
-        grid.setIsObstacle(3, 1, true);
-        grid.setIsObstacle(3, 2, true);
-
-        grid.setIsObstacle(7, 7, true);
-        grid.setIsObstacle(6, 7, true);
-        grid.setIsObstacle(6, 8, true);
-        grid.setIsObstacle(6, 9, true);
-        grid.setIsObstacle(6, 10, true);
-
-        grid.setIsObstacle(8, 3, true);
-        grid.setIsObstacle(8, 4, true);
-        grid.setIsObstacle(9, 4, true);
-
-        grid.setIsObstacle(14, 4, true);
-
-        grid.setIsObstacle(12, 9, true);
-        grid.setIsObstacle(12, 8, true);
-        grid.setIsObstacle(13, 8, true);
-        grid.setIsObstacle(14, 8, true);
-    }
 }
