@@ -47,10 +47,10 @@ public class RealRunButtonListener implements ActionListener {
         @Override
         protected Integer doInBackground() throws Exception {
             // receive way point
-            String msg = SocketMgr.getInstance().receiveMessage();
+            String msg = SocketMgr.getInstance().receiveMessage(false);
             List<Integer> waypoints;
             while ((waypoints = MessageMgr.parseMessage(msg)) == null) {
-                msg = SocketMgr.getInstance().receiveMessage();
+                msg = SocketMgr.getInstance().receiveMessage(false);
             }
 
             // do exploration

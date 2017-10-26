@@ -2,6 +2,7 @@ package model.entity;
 
 import model.util.SocketMgr;
 
+import java.net.SocketException;
 import java.util.List;
 import java.util.Observable;
 
@@ -327,7 +328,11 @@ public class Robot extends Observable {
     public void sense(boolean realRun) {
         if (realRun) {
             SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "S");
-            String sensorData = SocketMgr.getInstance().receiveMessage();
+            String sensorData = SocketMgr.getInstance().receiveMessage(true);
+            while (sensorData == null) {
+                SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "S");
+                sensorData = SocketMgr.getInstance().receiveMessage(true);
+            }
             String[] sensorReadings = sensorData.split(",", mSensors.size());
             for (int i = 0; i < mSensors.size(); i++) {
                 int returnedDistance = Integer.parseInt(sensorReadings[i]);

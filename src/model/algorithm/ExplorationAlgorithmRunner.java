@@ -33,14 +33,14 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         robot.reset();
         if (realRun) {
             grid.clearObstacles();
-            String msg = SocketMgr.getInstance().receiveMessage();
+            String msg = SocketMgr.getInstance().receiveMessage(false);
             while (!msg.equals("exs")) {
-                msg = SocketMgr.getInstance().receiveMessage();
+                msg = SocketMgr.getInstance().receiveMessage(false);
             }
         }
         // SELECT EITHER ONE OF THE METHODS TO RUN ALGORITHMS.
-        runExplorationAlgorithmThorough(grid, robot, realRun);
-        //runExplorationLeftWall(grid, robot, realRun);
+        //runExplorationAlgorithmThorough(grid, robot, realRun);
+        runExplorationLeftWall(grid, robot, realRun);
 
         // CALIBRATION AFTER EXPLORATION
         calibrateAndTurn(robot, realRun);
@@ -70,9 +70,9 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
 
         // CALIBRATE & SENSE
         int calibrationCounter = 0;
-        if (realRun) {
-            calibrateAtStart();
-        }
+//        if (realRun) {
+//            calibrateAtStart();
+//        }
         robot.sense(realRun);
 
         // INITIAL UPDATE OF MAP TO ANDROID

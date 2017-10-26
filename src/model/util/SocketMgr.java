@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 /**
  * A singleton class for using the socket
@@ -29,6 +31,7 @@ public class SocketMgr {
     public void openConnection() {
         try {
             mSocket = new Socket(ADDRESS, PORT);
+            //mSocket.setTcpNoDelay(true);
             mSocketWriter = new PrintWriter(mSocket.getOutputStream(), true);
             mSocketReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
             System.out.println("Socket connection successful");
@@ -55,24 +58,28 @@ public class SocketMgr {
     }
 
     public void sendMessage(String dest, String msg) {
-        //if (!isConnected())
-        //    openConnection();
         mSocketWriter.println(dest + msg);
         System.out.println("Sent message: " + dest + msg);
     }
 
-    public String receiveMessage() {
-        //if (!isConnected())
-        //    openConnection();
+    public String receiveMessage(boolean sensor) {
+        try {
+            if (sensor)
+                mSocket.setSoTimeout(3000);
+            else
+                mSocket.setSoTimeout(0);
+        } catch (SocketException e) {
+
+        }
         try {
             String msg = mSocketReader.readLine();
             System.out.println("Received message: " + msg);
-
             return msg;
+        } catch (SocketTimeoutException e) {
+            System.out.println("Sensor reading timeout!!!");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return null;
     }
 

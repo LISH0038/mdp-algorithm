@@ -28,9 +28,9 @@ public class TimeExplorationAlgorithmRunner implements AlgorithmRunner{
         grid.reset();
         robot.reset();
         if (realRun) {
-            String msg = SocketMgr.getInstance().receiveMessage();
+            String msg = SocketMgr.getInstance().receiveMessage(false);
             while (!msg.equals("exs")) {
-                msg = SocketMgr.getInstance().receiveMessage();
+                msg = SocketMgr.getInstance().receiveMessage(false);
             }
         }
         int minutes = -1;
