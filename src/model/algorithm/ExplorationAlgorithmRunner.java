@@ -39,8 +39,8 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
             }
         }
         // SELECT EITHER ONE OF THE METHODS TO RUN ALGORITHMS.
-        //runExplorationAlgorithmThorough(grid, robot, realRun);
-        runExplorationLeftWall(grid, robot, realRun);
+        runExplorationAlgorithmThorough(grid, robot, realRun);
+//        runExplorationLeftWall(grid, robot, realRun);
 
         // CALIBRATION AFTER EXPLORATION
         calibrateAndTurn(robot, realRun);
@@ -153,9 +153,9 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
 
         // CALIBRATE & SENSE
         int calibrationCounter = 0;
-        if (realRun) {
-            calibrateAtStart();
-        }
+//        if (realRun) {
+//            calibrateAtStart();
+//        }
         robot.sense(realRun);
 
         // INITIAL UPDATE OF MAP TO ANDROID
@@ -235,38 +235,37 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                 fakeRobot.setPosY(robot.getPosY());
                 fakeRobot.setHeading(robot.getHeading());
                 List<String> returnPath = AlgorithmRunner.runAstar(robot.getPosX(), robot.getPosY(), START_X, START_Y, grid, fakeRobot);
+                fakeRobot.setPosX(robot.getPosX());
+                fakeRobot.setPosY(robot.getPosY());
+                fakeRobot.setHeading(robot.getHeading());
+                String compressed = AlgorithmRunner.compressPathForExploration(returnPath, fakeRobot);
 
                 if (returnPath != null) {
                     System.out.println("Algorithm finished, executing actions");
                     System.out.println(returnPath.toString());
+                    if (realRun) {
+                        SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, compressed);
+                    }
 
                     for (String action : returnPath) {
                         if (action.equals("M")) {
-                            if (realRun)
-                                SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "M1");
                             robot.move();
                         } else if (action.equals("L")) {
-                            if (realRun)
-                                SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
                             robot.turn(LEFT);
                         } else if (action.equals("R")) {
-                            if (realRun)
-                                SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
                             robot.turn(RIGHT);
                         } else if (action.equals("U")) {
-                            if (realRun)
-                                SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "U");
                             robot.turn(LEFT);
                             robot.turn(LEFT);
                         }
-                        robot.sense(realRun);
+//                        robot.sense(realRun);
                         if (realRun)
                             SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
                                     MessageMgr.generateMapDescriptorMsg(grid.generateForAndroid(),
                                             robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
                         stepTaken();
                     }
-                }else {
+                } else {
                     System.out.println("Fastest path not found!");
                 }
 
@@ -277,6 +276,9 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
             }
         }
 
+        //
+        // BELOW IS THE 2ND EXPLORATION !!!!!!!!!!!!!
+        //
         // INITIALISE NEW GRID TO PREVENT CHECKING PREVIOUSLY EXPLORED CELLS.
         Grid exploreChecker = new Grid();
         for (int x = 0; x < MAP_COLS; x++) {
@@ -287,8 +289,9 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         }
 
         // SWEEPING THROUGH UNEXPLORED, BUT REACHABLE CELLS WITHIN ARENA.
-        if(grid.checkExploredPercentage() != 100){ // CHECK FOR UNEXPLORED CELLS
-            for (int y = MAP_ROWS; y >= 0; y--) {
+        if(grid.checkExploredPercentage() < 100.0){ // CHECK FOR UNEXPLORED CELLS
+            System.out.println("NOT FULLY EXPLORED, DOING A 2ND RUN!");
+            for (int y = MAP_ROWS - 1; y >= 0; y--) {
                 for (int x = MAP_COLS - 1; x >= 0; x--) {
                     // CHECK FOR UNEXPLORED CELLS && CHECK IF NEIGHBOURS ARE REACHABLE OR NOT
                     if (!grid.getIsExplored(x, y) &&
@@ -434,34 +437,29 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
                     System.out.println(returnPath.toString());
 
                     if (realRun) {
-                        String compressedPath = AlgorithmRunner.compressPath(returnPath);
+                        fakeRobot.setPosX(robot.getPosX());
+                        fakeRobot.setPosY(robot.getPosY());
+                        fakeRobot.setHeading(robot.getHeading());
+                        String compressedPath = AlgorithmRunner.compressPathForExploration(returnPath, fakeRobot);
                         SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, compressedPath);
                     } else {
                         for (String action : returnPath) {
-                            robot.sense(realRun);
+//                            robot.sense(realRun);
+                            if (action.equals("M")) {
+                                robot.move();
+                            } else if (action.equals("L")) {
+                                robot.turn(LEFT);
+                            } else if (action.equals("R")) {
+                                robot.turn(RIGHT);
+                            } else if (action.equals("U")) {
+                                robot.turn(LEFT);
+                                robot.turn(LEFT);
+                            }
                             if (realRun)
                                 SocketMgr.getInstance().sendMessage(TARGET_ANDROID,
                                         MessageMgr.generateMapDescriptorMsg(grid.generateForAndroid(),
                                                 robot.getCenterPosX(), robot.getCenterPosY(), robot.getHeading()));
                             stepTaken();
-                            if (action.equals("M")) {
-                                if (realRun)
-                                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "M1");
-                                robot.move();
-                            } else if (action.equals("L")) {
-                                if (realRun)
-                                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "L");
-                                robot.turn(LEFT);
-                            } else if (action.equals("R")) {
-                                if (realRun)
-                                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "R");
-                                robot.turn(RIGHT);
-                            } else if (action.equals("U")) {
-                                if (realRun)
-                                    SocketMgr.getInstance().sendMessage(TARGET_ARDUINO, "U");
-                                robot.turn(LEFT);
-                                robot.turn(LEFT);
-                            }
                         }
                     }
                 }else {

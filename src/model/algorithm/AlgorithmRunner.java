@@ -255,7 +255,7 @@ public interface AlgorithmRunner {
         StringBuilder builder = new StringBuilder();
 
         for (String action : actions) {
-            if (action.equals("L") || action.equals("R") || action.equals("U")) {
+            if (action.equals("L") || action.equals("R") || action.equals("U") || action.equals("C")) {
                 if (moveCounter != 0) {
                     builder.append("M");
                     builder.append(moveCounter);
@@ -272,5 +272,29 @@ public interface AlgorithmRunner {
         }
 
         return builder.toString();
+    }
+
+    static String compressPathForExploration(List<String> actions, Robot fakeRobot) {
+        List<String> actionWithCalibration = new ArrayList<>();
+        for (String action : actions) {
+            actionWithCalibration.add(action); // copy action to new list
+            // execute action on fake robot
+            if (action.equals("L")) {
+                fakeRobot.turn(LEFT);
+            } else if (action.equals("R")) {
+                fakeRobot.turn(RIGHT);
+            } else if (action.equals("U")) {
+                fakeRobot.turn(LEFT);
+                fakeRobot.turn(LEFT);
+            } else if (action.equals("M")) {
+                fakeRobot.move();
+            }
+            // check calibration
+            if (fakeRobot.canCalibrateFront()) {
+                actionWithCalibration.add("C");
+            }
+        }
+
+        return compressPath(actionWithCalibration);
     }
 }
