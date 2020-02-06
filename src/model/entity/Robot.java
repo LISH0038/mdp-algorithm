@@ -353,4 +353,8 @@ public class Robot extends Observable {
             }
         }
     }
+
+    public void updateMapForAstar(int x , int y, boolean b){
+        mGrid.setExploredByAstar(x,y,b);
+    }
 }

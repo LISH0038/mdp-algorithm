@@ -68,6 +68,12 @@ public class Grid extends Observable {
         notifyObservers();
     }
 
+    public void setExploredByAstar(int x, int y, boolean explored) {
+        cells[x][y].setmExploredByAstar(explored);
+        setChanged();
+        notifyObservers();
+    }
+
     public boolean getIsExplored(int x, int y) {
         return !isOutOfArena(x, y) && cells[x][y].getExplored();
     }

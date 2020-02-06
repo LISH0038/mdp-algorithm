@@ -11,6 +11,7 @@ public class Cell implements Comparable<Cell> {
     private int mDistance;
     private boolean mExplored = false;
     private boolean mIsObstacle = false;
+    private boolean mExploredByAstar = false;
     private int counter = 0;
 
     Cell() {}
@@ -30,6 +31,10 @@ public class Cell implements Comparable<Cell> {
         mExplored = explored;
     }
 
+    void setmExploredByAstar(boolean explored) {
+        mExploredByAstar = explored;
+    }
+
     void setIsObstacle(boolean isObstacle) {
         mIsObstacle = isObstacle;
     }
@@ -40,6 +45,10 @@ public class Cell implements Comparable<Cell> {
 
     public boolean getIsObstacle() {
         return mIsObstacle;
+    }
+
+    public boolean getmExploredByAstar() {
+        return mExploredByAstar;
     }
 
     public int getX() {

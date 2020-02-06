@@ -68,13 +68,23 @@ public interface AlgorithmRunner {
 
             openSet.remove(current);
             closedSet[current.getX()][current.getY()] = true;
+            //For showing A* running
+            robot.updateMapForAstar(current.getX(),current.getY(),false);
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             for (Cell neighbor : generateNeighbor(grid, current, cells)) {
                 if (closedSet[neighbor.getX()][neighbor.getY()])
                     continue;
 
-                if (!openSet.contains(neighbor))
+                if (!openSet.contains(neighbor)){
                     openSet.add(neighbor);
+                    robot.updateMapForAstar(current.getX(),current.getY(),true);
+                }
 
                 int tentativeGScore = gScore[current.getX()][current.getY()] + 1;
                 Cell previousCell = cameFrom.get(current);

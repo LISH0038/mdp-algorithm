@@ -44,12 +44,20 @@ public class MapPanel extends JPanel implements Observer {
                     g2d.setColor(Color.YELLOW);
                 else if (Grid.isInEndZone(x, y))
                     g2d.setColor(Color.BLUE);
+                else if (cells[x][y].getmExploredByAstar()) {
+                    if (cells[x][y].getIsObstacle())
+                        g2d.setColor(Color.RED);
+                    else
+                        g2d.setColor(Color.PINK);
+                }
                 else if (cells[x][y].getExplored()) {
                     if (cells[x][y].getIsObstacle())
                         g2d.setColor(Color.BLACK);
                     else
                         g2d.setColor(Color.WHITE);
-                } else {
+                }
+
+                else {
                     g2d.setColor(Color.LIGHT_GRAY);
                 }
                 g2d.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);

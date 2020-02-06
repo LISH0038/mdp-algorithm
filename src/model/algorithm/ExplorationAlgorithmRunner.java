@@ -522,7 +522,7 @@ public class ExplorationAlgorithmRunner implements AlgorithmRunner {
         fakeRobot.setPosX(robot.getPosX());
         fakeRobot.setPosY(robot.getPosY());
         fakeRobot.setHeading(robot.getHeading());
-        List<String> returnPath = AlgorithmRunner.runAstar(robot.getPosX(), robot.getPosY(), x, y, grid, fakeRobot);
+        List<String> returnPath = AlgorithmRunner.runAstar(robot.getPosX(), robot.getPosY(), x, y, grid, robot);
         if (returnPath != null) {
             System.out.println("Algorithm finished, executing actions");
             System.out.println(returnPath.toString());

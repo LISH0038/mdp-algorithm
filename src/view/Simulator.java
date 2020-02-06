@@ -74,7 +74,7 @@ public class Simulator extends JFrame {
 
         // set up the frame
         pack();
-        setTitle("MDP Group 16 Simulator");
+        setTitle("MDP Group 12 Simulator");
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
